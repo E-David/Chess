@@ -29,5 +29,43 @@ module Chess
 			board = Board.new(grid: "this")
 			expect(board.grid).to eq "this"
 		end
+
+		context "#get_square" do
+			it "retrieves square when given valid input" do
+				board = Board.new(grid: [["","",""],["","something",""]])
+				expect(board.get_square(1,1)).to eq "something"
+			end
+		end
+
+		context "#set_square" do
+			it "changes value to given piece" do
+				Cat = Struct.new(:value)
+				board = Board.new(grid: [["","",""],["",Cat.new("cool"),""]])
+				board.set_square(1,1,"meow")
+				expect(board.get_square(1,1).value).to eq "meow"
+			end
+		end
+
+		context "#game_over" do
+			it "returns winner if winner? is true" do
+				board = Board.new
+				allow(board).to receive(:winner?) { true }
+				expect(board.game_over).to eq :winner
+			end
+
+			it "returns draw if draw? is true" do
+				board = Board.new
+				allow(board).to receive(:winner?) { false }
+				allow(board).to receive(:draw?) { true }
+				expect(board.game_over).to eq :draw
+			end
+
+			it "returns false if winner? and draw? are false" do
+				board = Board.new
+				allow(board).to receive(:winner?) { false }
+				allow(board).to receive(:draw?) { false }
+				expect(board.game_over).to eq false
+			end
+		end
 	end
 end

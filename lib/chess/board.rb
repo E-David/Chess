@@ -5,6 +5,20 @@ module Chess
 			@grid = input.fetch(:grid, default_board)
 		end
 
+		def get_square(x,y)
+			grid[x][y]
+		end
+
+		def set_square(x,y,piece)
+			get_square(x,y).value = piece
+		end
+
+		def game_over
+			return :winner if winner?
+			return :draw if draw?
+			false
+		end
+
 		private
 
 		def default_board
