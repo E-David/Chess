@@ -6,7 +6,6 @@ module Chess
 				expect { Board.new(grid: "grid").to_not raise_error}
 			end
 		end
-<<<<<<< HEAD
 
 		it "sets the grid with 8 rows by default" do
 			board = Board.new
@@ -25,7 +24,10 @@ module Chess
 				expect(row.first.color).to eq "black" if index.odd?
 			end
 		end
-=======
->>>>>>> create-board-class
+
+		it "sets the grid with given input" do
+			board = Board.new(grid: "this")
+			expect(board.grid).to eq "this"
+		end
 	end
 end
