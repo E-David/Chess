@@ -40,9 +40,8 @@ module Chess
 
 		def is_enemy?(x_coord,y_coord)
 			square = get_square(x_coord,y_coord)
-			self.color == square.value.color
+			self.color != square.value.color
 		end
-
 
 		def game_over
 			return :winner if winner?
@@ -53,7 +52,7 @@ module Chess
 		private
 
 		def default_board
-			Array.new(7) { Array.new(7) { Square.new("","",0,0) } }
+			Array.new(8) { Array.new(8) { Square.new("","",0,0) } }
 		end
 	end
 end
