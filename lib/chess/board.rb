@@ -3,16 +3,12 @@ module Chess
 		attr_reader :grid
 		def initialize(input = {})
 			@grid = input.fetch(:grid, default_board)
-			colorize_board
-			coordinate_board
-			set_up_board
 		end
 
 		def coordinate_board
 			grid.each_with_index do |row,row_index| 
 				row.each_with_index do |square,column_index|
-					square.x_coord = row_index
-					square.y_coord = column_index
+					square.coordinate = [row_index,column_index]
 				end
 			end
 		end
@@ -21,26 +17,38 @@ module Chess
 			grid.flatten.each_with_index { |square, index| index.odd? ? square.color = "black" : square.color = "white" }
 		end
 
-		def set_up_board
-			pawn = Pawn.new("white",[6,1])
-			set_square(0,1,pawn)
+		def get_square(coordinate)
+			grid[coordinate[0]][coordinate[1]]
 		end
 
-		def get_square(x,y)
-			grid[x][y]
+		def get_piece(coordinate)
+			get_square(coordinate).value
 		end
 
-		def set_square(x,y,piece)
-			get_square(x,y).value = piece
+		def set_square(coordinate,piece)
+			get_square(coordinate).value = piece
 		end
 
-		def is_occupied?
-			self.value != ""
+		def is_unoccupied?(coordinate)
+			get_square(coordinate).value == ""
 		end
 
-		def is_enemy?(x_coord,y_coord)
-			square = get_square(x_coord,y_coord)
-			self.color != square.value.color
+		def is_enemy?(move_from,move_to)
+			from_square = get_square(move_from)
+			to_square = get_square(move_to)
+			from_square.color != to_square.color
+		end
+
+		def valid_move?(move_from, move_to)
+			piece = get_piece(move_from)
+			valid_moves = piece.valid_moves
+			valid_moves.any? { |move| move == move_to }
+		end
+
+		def check_move(move_from, move_to)
+			if valid_move?(move_from, move_to)
+				is_unoccupied?(move_to) || is_enemy?(move_from,move_to)
+			end
 		end
 
 		def game_over
@@ -52,7 +60,7 @@ module Chess
 		private
 
 		def default_board
-			Array.new(8) { Array.new(8) { Square.new("","",0,0) } }
+			Array.new(8) { Array.new(8) { Square.new } }
 		end
 	end
 end

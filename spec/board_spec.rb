@@ -1,6 +1,7 @@
 require "spec_helper.rb"
 module Chess
 	describe Board do
+
 		context "#initialize" do
 			it "initializes the board with a grid" do
 				expect { Board.new(grid: "grid").to_not raise_error}
@@ -16,19 +17,6 @@ module Chess
 				board.grid.each { |row| expect(row.size).to eq 8 }			
 			end
 
-			it "sets the grid with alternating rows" do
-				board = Board.new
-				board.grid.each_with_index do |row, index|
-					if index.even?
-						expect(row.first.color).to eq "white" 
-						expect(row.last.color).to eq "white" 
-					elsif index.odd?
-						expect(row.first.color).to eq "black" 
-						expect(row.last.color).to eq "black"
-					end
-				end
-			end
-
 			it "sets the grid with given input" do
 				board = Board.new(grid: [0,1,2])
 				expect(board.grid).to eq [0,1,2]
@@ -37,27 +25,94 @@ module Chess
 
 		context "#coordinate_board" do
 			it "sets square position to row/column index" do
-				cat = Struct.new(:x_coord,:y_coord)
-				board = Board.new(grid: [["","",""],[cat(1,4),"",""]])
+				Cat = Struct.new(:coordinate)
+				board = Board.new(grid: [[Cat.new(),Cat.new()],[Cat.new(),Cat.new()]])
 				board.coordinate_board
-				expect(board[1][0].x_coord).to eq 1
-				expect(board[1][0].y_coord).to eq 0
+				expect(board.grid[0][1].coordinate).to eq [0,1]
+				expect(board.grid[1][1].coordinate).to eq [1,1]
+			end
+		end
+
+		context "#colorize_board" do
+			it "sets board to alternating square colors" do
+				Cat = Struct.new(:color)
+				board = Board.new(grid: [[Cat.new(""),Cat.new("")],[Cat.new(""),Cat.new("")]])
+				board.colorize_board
+				expect(board.grid[0][0].color).to eq "white"
+				expect(board.grid[0][1].color).to eq "black"
+				expect(board.grid[1][1].color).to eq "black"
 			end
 		end
 
 		context "#get_square" do
 			it "retrieves square when given valid input" do
 				board = Board.new(grid: [["","",""],["","something",""]])
-				expect(board.get_square(1,1)).to eq "something"
+				expect(board.get_square([1,1])).to eq "something"
 			end
 		end
 
 		context "#set_square" do
 			it "changes value to given piece" do
 				Cat = Struct.new(:value)
-				board = Board.new(grid: [["","",""],["",Cat("cool"),""]])
-				board.set_square(1,1,"meow")
-				expect(board.get_square(1,1).value).to eq "meow"
+				board = Board.new(grid: [["","",""],["",Cat.new("cool"),""]])
+				board.set_square([1,1],"meow")
+				expect(board.get_square([1,1]).value).to eq "meow"
+			end
+		end
+
+		context "#is_unoccupied?" do
+			it "returns true if square has a piece value" do
+				Cat = Struct.new(:value)
+				board = Board.new(grid: [[Cat.new("something"),Cat.new("")]])
+				expect(board.is_unoccupied?([0,0])).to be_falsey
+				expect(board.is_unoccupied?([0,1])).to be_truthy
+			end
+		end
+
+		context "#is_enemy?" do
+			it "returns true if colors aren't equal" do
+				Piece = Struct.new(:color)
+				board = Board.new(grid: [[Piece.new("white"),Piece.new("black"),Piece.new("white")]])
+				expect(board.is_enemy?([0,0],[0,1])).to be_truthy
+			end
+		end
+
+		context "#valid_move?" do
+			it "returns true if piece can move there" do
+				Piece = Struct.new(:valid_moves)
+				board = Board.new
+				piece = Piece.new([0,0])
+				expect(piece.valid_moves)).to satisfy { |move| move == move_to }
+			end
+		end
+
+		context "#check_move" do
+			let(:board) { Board.new }
+			it "returns true if move is valid and square is unoccupied" do
+				allow(board).to receive(:valid_move?) { true }
+				allow(board).to receive(:is_unoccupied?) { true }
+				expect(board.check_move("this","that")).to be_truthy
+			end
+
+			it "returns true if move is valid and square is an enemy" do
+				allow(board).to receive(:valid_move?) { true }
+				allow(board).to receive(:is_unoccupied?) { false }
+				allow(board).to receive(:is_enemy?) { true }
+				expect(board.check_move("this","that")).to be_truthy
+			end
+
+			it "returns false if move is not valid" do
+				allow(board).to receive(:valid_move?) { false }
+				allow(board).to receive(:is_unoccupied?) { true }
+				allow(board).to receive(:is_enemy?) { true }
+				expect(board.check_move("this","that")).to be_falsey
+			end
+
+			it "returns false if move is valid and square is not an enemy" do
+				allow(board).to receive(:valid_move?) { true }
+				allow(board).to receive(:is_unoccupied?) { false }
+				allow(board).to receive(:is_enemy?) { false }
+				expect(board.check_move("this","that")).to be_falsey
 			end
 		end
 
