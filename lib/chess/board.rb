@@ -34,15 +34,12 @@ module Chess
 		end
 
 		def is_enemy?(move_from,move_to)
-			from_square = get_square(move_from)
-			to_square = get_square(move_to)
-			from_square.color != to_square.color
+			get_square(move_from).color != get_square(move_to).color
 		end
 
 		def valid_move?(move_from, move_to)
-			piece = get_piece(move_from)
-			valid_moves = piece.valid_moves
-			valid_moves.any? { |move| move == move_to }
+			valid_moves = get_piece(move_from).valid_moves
+			valid_moves.include? (move_to)
 		end
 
 		def check_move(move_from, move_to)
@@ -64,3 +61,4 @@ module Chess
 		end
 	end
 end
+

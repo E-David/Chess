@@ -79,10 +79,17 @@ module Chess
 
 		context "#valid_move?" do
 			it "returns true if piece can move there" do
+				Square = Struct.new(:value)
 				Piece = Struct.new(:valid_moves)
-				board = Board.new
-				piece = Piece.new([0,0])
-				expect(piece.valid_moves)).to satisfy { |move| move == move_to }
+				board = Board.new(grid: [[Square.new(Piece.new([[5,5]]))]])
+				expect(board.valid_move?([0,0],[5,5])).to be_truthy
+			end
+
+			it "returns false if piece cannot move there" do
+				Square = Struct.new(:value)
+				Piece = Struct.new(:valid_moves)
+				board = Board.new(grid: [[Square.new(Piece.new([[1,1]]))]])
+				expect(board.valid_move?([0,0],[5,5])).to be_falsey
 			end
 		end
 
