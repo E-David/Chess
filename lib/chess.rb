@@ -8,7 +8,3 @@ module Chess
 	require_relative "./chess/game.rb"
 	require_relative "./chess/core_extensions.rb"
 end
-
-x = Chess::Board.new
-x.coordinate_board
-p x.get_square([7,1])

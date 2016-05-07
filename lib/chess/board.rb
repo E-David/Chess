@@ -37,13 +37,33 @@ module Chess
 			get_square(move_from).color != get_square(move_to).color
 		end
 
-		def valid_move?(move_from, move_to)
+		def is_valid_move?(move_from, move_to)
 			valid_moves = get_piece(move_from).valid_moves
 			valid_moves.include? (move_to)
 		end
 
+		def horizontal_movement_check(move_from, move_to)
+			row = move_from[0]
+			col = move_from[1]
+			until col > move_to[0]
+				col += 1
+				break if is_unoccupied?([row,col]) == false
+			end
+			return is_unoccupied?([row,col])
+		end
+
+		def horizontal_movement_check(move_from, move_to)
+			row = move_from[0]
+			col = move_from[1]
+			until col > move_to[0]
+				col += 1
+				break if is_unoccupied?([row,col]) == false
+			end
+			return is_unoccupied?([row,col])
+		end
+
 		def check_move(move_from, move_to)
-			if valid_move?(move_from, move_to)
+			if is_valid_move?(move_from, move_to)
 				is_unoccupied?(move_to) || is_enemy?(move_from,move_to)
 			end
 		end
@@ -61,4 +81,3 @@ module Chess
 		end
 	end
 end
-

@@ -77,46 +77,62 @@ module Chess
 			end
 		end
 
-		context "#valid_move?" do
+		context "#is_valid_move?" do
 			it "returns true if piece can move there" do
 				Square = Struct.new(:value)
 				Piece = Struct.new(:valid_moves)
 				board = Board.new(grid: [[Square.new(Piece.new([[5,5]]))]])
-				expect(board.valid_move?([0,0],[5,5])).to be_truthy
+				expect(board.is_valid_move?([0,0],[5,5])).to be_truthy
 			end
 
 			it "returns false if piece cannot move there" do
 				Square = Struct.new(:value)
 				Piece = Struct.new(:valid_moves)
 				board = Board.new(grid: [[Square.new(Piece.new([[1,1]]))]])
-				expect(board.valid_move?([0,0],[5,5])).to be_falsey
+				expect(board.is_valid_move?([0,0],[5,5])).to be_falsey
+			end
+		end
+
+		context "#horizontal_movement_check" do
+			it "returns true if piece is unhindered horizontally" do
+				square = Struct.new(:value)
+				board = Board.new(grid: [[Square.new(""),Square.new("")],
+										 [Square.new(""),Square.new("")]])
+				expect(board.horizontal_movement_check([0,0],[0,1])).to be_truthy
+			end
+
+			it "returns false if piece is hindered horizontally" do
+				square = Struct.new(:value)
+				board = Board.new(grid: [[Square.new(""),Square.new("Occupied")],
+										 [Square.new(""),Square.new("")]])
+				expect(board.horizontal_movement_check([0,0],[0,1])).to be_falsey
 			end
 		end
 
 		context "#check_move" do
 			let(:board) { Board.new }
 			it "returns true if move is valid and square is unoccupied" do
-				allow(board).to receive(:valid_move?) { true }
+				allow(board).to receive(:is_valid_move?) { true }
 				allow(board).to receive(:is_unoccupied?) { true }
 				expect(board.check_move("this","that")).to be_truthy
 			end
 
 			it "returns true if move is valid and square is an enemy" do
-				allow(board).to receive(:valid_move?) { true }
+				allow(board).to receive(:is_valid_move?) { true }
 				allow(board).to receive(:is_unoccupied?) { false }
 				allow(board).to receive(:is_enemy?) { true }
 				expect(board.check_move("this","that")).to be_truthy
 			end
 
 			it "returns false if move is not valid" do
-				allow(board).to receive(:valid_move?) { false }
+				allow(board).to receive(:is_valid_move?) { false }
 				allow(board).to receive(:is_unoccupied?) { true }
 				allow(board).to receive(:is_enemy?) { true }
 				expect(board.check_move("this","that")).to be_falsey
 			end
 
 			it "returns false if move is valid and square is not an enemy" do
-				allow(board).to receive(:valid_move?) { true }
+				allow(board).to receive(:is_valid_move?) { true }
 				allow(board).to receive(:is_unoccupied?) { false }
 				allow(board).to receive(:is_enemy?) { false }
 				expect(board.check_move("this","that")).to be_falsey
