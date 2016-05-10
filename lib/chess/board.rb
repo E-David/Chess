@@ -45,17 +45,28 @@ module Chess
 		def horizontal_movement_check(move_from, move_to)
 			row = move_from[0]
 			col = move_from[1]
-			until col > move_to[0]
-				col += 1
+			until col == move_to[1]
+				col > move_to[1] ? col -= 1 : col += 1
 				break if is_unoccupied?([row,col]) == false
 			end
 			return is_unoccupied?([row,col])
 		end
 
-		def horizontal_movement_check(move_from, move_to)
+		def vertical_movement_check(move_from, move_to)
 			row = move_from[0]
 			col = move_from[1]
-			until col == move_to[1]
+			until row == move_to[0]
+				row > move_to[0] ? row -= 1 : row += 1
+				break if is_unoccupied?([row,col]) == false
+			end
+			return is_unoccupied?([row,col])
+		end
+
+		def diagonal_movement_check(move_from, move_to)
+			row = move_from[0]
+			col = move_from[1]
+			until (row == move_to[0]) && (col == move_to[1])
+				row > move_to[0] ? row -= 1 : row += 1
 				col > move_to[1] ? col -= 1 : col += 1
 				break if is_unoccupied?([row,col]) == false
 			end

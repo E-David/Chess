@@ -103,6 +103,46 @@ module Chess
 			end
 		end
 
+		context "#vertical_movement_check" do
+			it "returns true if piece is unhindered vertically either direction" do
+				board = Board.new(grid: [[Value.new("")],
+										 [Value.new("")],
+										 [Value.new("")]])
+				expect(board.vertical_movement_check([0,0],[2,0])).to be_truthy
+				expect(board.vertical_movement_check([2,0],[0,0])).to be_truthy
+			end
+
+			it "returns false if piece is hindered vertically either direction" do
+				board = Board.new(grid: [[Value.new("")],
+										 [Value.new("Occupied")],
+										 [Value.new("")]])
+				expect(board.vertical_movement_check([0,0],[2,0])).to be_falsey
+				expect(board.vertical_movement_check([2,0],[0,0])).to be_falsey
+			end
+		end
+
+		context "#diagonal_movement_check" do
+			it "returns true if piece is unhindered diagonally in any direction" do
+				board = Board.new(grid: [[Value.new(""),Value.new(""),Value.new("")],
+										 [Value.new(""),Value.new(""),Value.new("")],
+										 [Value.new(""),Value.new(""),Value.new("")]])
+				expect(board.diagonal_movement_check([0,0],[2,2])).to be_truthy
+				expect(board.diagonal_movement_check([2,2],[0,0])).to be_truthy
+				expect(board.diagonal_movement_check([0,2],[2,0])).to be_truthy
+				expect(board.diagonal_movement_check([2,0],[0,2])).to be_truthy
+			end
+
+			it "returns false if piece is hindered diagonally in any direction" do
+				board = Board.new(grid: [[Value.new(""),Value.new(""),Value.new("")],
+										 [Value.new(""),Value.new("Occupied"),Value.new("")],
+										 [Value.new(""),Value.new(""),Value.new("")]])
+				expect(board.diagonal_movement_check([0,0],[2,2])).to be_falsey
+				expect(board.diagonal_movement_check([2,2],[0,0])).to be_falsey
+				expect(board.diagonal_movement_check([0,2],[2,0])).to be_falsey
+				expect(board.diagonal_movement_check([2,0],[0,2])).to be_falsey
+			end		
+		end
+
 		context "#check_move" do
 			let(:board) { Board.new }
 			it "returns true if move is valid and square is unoccupied" do
