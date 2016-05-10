@@ -25,8 +25,8 @@ module Chess
 
 		context "#coordinate_board" do
 			it "sets square position to row/column index" do
-				Cat = Struct.new(:coordinate)
-				board = Board.new(grid: [[Cat.new(),Cat.new()],[Cat.new(),Cat.new()]])
+				Coordinate = Struct.new(:coordinate)
+				board = Board.new(grid: [[Coordinate.new(),Coordinate.new()],[Coordinate.new(),Coordinate.new()]])
 				board.coordinate_board
 				expect(board.grid[0][1].coordinate).to eq [0,1]
 				expect(board.grid[1][1].coordinate).to eq [1,1]
@@ -35,8 +35,8 @@ module Chess
 
 		context "#colorize_board" do
 			it "sets board to alternating square colors" do
-				Cat = Struct.new(:color)
-				board = Board.new(grid: [[Cat.new(""),Cat.new("")],[Cat.new(""),Cat.new("")]])
+				Color = Struct.new(:color)
+				board = Board.new(grid: [[Color.new(""),Color.new("")],[Color.new(""),Color.new("")]])
 				board.colorize_board
 				expect(board.grid[0][0].color).to eq "white"
 				expect(board.grid[0][1].color).to eq "black"
@@ -53,8 +53,8 @@ module Chess
 
 		context "#set_square" do
 			it "changes value to given piece" do
-				Cat = Struct.new(:value)
-				board = Board.new(grid: [["","",""],["",Cat.new("cool"),""]])
+				Value = Struct.new(:value)
+				board = Board.new(grid: [["","",""],["",Value.new("cool"),""]])
 				board.set_square([1,1],"meow")
 				expect(board.get_square([1,1]).value).to eq "meow"
 			end
@@ -62,8 +62,7 @@ module Chess
 
 		context "#is_unoccupied?" do
 			it "returns true if square has a piece value" do
-				Cat = Struct.new(:value)
-				board = Board.new(grid: [[Cat.new("something"),Cat.new("")]])
+				board = Board.new(grid: [[Value.new("something"),Value.new("")]])
 				expect(board.is_unoccupied?([0,0])).to be_falsey
 				expect(board.is_unoccupied?([0,1])).to be_truthy
 			end
@@ -71,41 +70,36 @@ module Chess
 
 		context "#is_enemy?" do
 			it "returns true if colors aren't equal" do
-				Piece = Struct.new(:color)
-				board = Board.new(grid: [[Piece.new("white"),Piece.new("black"),Piece.new("white")]])
+				Piece_Color = Struct.new(:color)
+				board = Board.new(grid: [[Piece_Color.new("white"),Piece_Color.new("black"),Piece_Color.new("white")]])
 				expect(board.is_enemy?([0,0],[0,1])).to be_truthy
 			end
 		end
 
 		context "#is_valid_move?" do
 			it "returns true if piece can move there" do
-				Square = Struct.new(:value)
-				Piece = Struct.new(:valid_moves)
-				board = Board.new(grid: [[Square.new(Piece.new([[5,5]]))]])
+				Valid_Moves = Struct.new(:valid_moves)
+				board = Board.new(grid: [[Value.new(Valid_Moves.new([[5,5]]))]])
 				expect(board.is_valid_move?([0,0],[5,5])).to be_truthy
 			end
 
 			it "returns false if piece cannot move there" do
-				Square = Struct.new(:value)
-				Piece = Struct.new(:valid_moves)
-				board = Board.new(grid: [[Square.new(Piece.new([[1,1]]))]])
+				board = Board.new(grid: [[Value.new(Valid_Moves.new([[1,1]]))]])
 				expect(board.is_valid_move?([0,0],[5,5])).to be_falsey
 			end
 		end
 
 		context "#horizontal_movement_check" do
-			it "returns true if piece is unhindered horizontally" do
-				square = Struct.new(:value)
-				board = Board.new(grid: [[Square.new(""),Square.new("")],
-										 [Square.new(""),Square.new("")]])
-				expect(board.horizontal_movement_check([0,0],[0,1])).to be_truthy
+			it "returns true if piece is unhindered horizontally either direction" do
+				board = Board.new(grid: [[Value.new(""),Value.new(""),Value.new("")]])
+				expect(board.horizontal_movement_check([0,0],[0,2])).to be_truthy
+				expect(board.horizontal_movement_check([0,2],[0,0])).to be_truthy
 			end
 
-			it "returns false if piece is hindered horizontally" do
-				square = Struct.new(:value)
-				board = Board.new(grid: [[Square.new(""),Square.new("Occupied")],
-										 [Square.new(""),Square.new("")]])
-				expect(board.horizontal_movement_check([0,0],[0,1])).to be_falsey
+			it "returns false if piece is hindered horizontally either direction" do
+				board = Board.new(grid: [[Value.new(""),Value.new("Occupied"),Value.new("")]])
+				expect(board.horizontal_movement_check([0,0],[0,2])).to be_falsey
+				expect(board.horizontal_movement_check([0,2],[0,0])).to be_falsey
 			end
 		end
 
