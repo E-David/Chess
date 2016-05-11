@@ -73,9 +73,21 @@ module Chess
 			return is_unoccupied?([row,col])
 		end
 
+		def direction_check(move_from, move_to)
+			if (move_from[0] != move_to[0] && move_from[1] != move_to[1])
+				return diagonal_movement_check(move_from,move_to)
+			else
+				move_from[0] != move_to[0] ? (return vertical_movement_check) : (return horizontal_movement_check)
+			end
+		end
+
 		def check_move(move_from, move_to)
 			if is_valid_move?(move_from, move_to)
-				is_unoccupied?(move_to) || is_enemy?(move_from,move_to)
+				if (is_unoccupied?(move_to) || is_enemy?(move_from,move_to))
+					true
+				else
+					false
+				end
 			end
 		end
 

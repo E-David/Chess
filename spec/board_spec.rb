@@ -63,8 +63,8 @@ module Chess
 		context "#is_unoccupied?" do
 			it "returns true if square has a piece value" do
 				board = Board.new(grid: [[Value.new("something"),Value.new("")]])
-				expect(board.is_unoccupied?([0,0])).to be_falsey
-				expect(board.is_unoccupied?([0,1])).to be_truthy
+				expect(board.is_unoccupied?([0,0])).to be false
+				expect(board.is_unoccupied?([0,1])).to be true
 			end
 		end
 
@@ -72,7 +72,7 @@ module Chess
 			it "returns true if colors aren't equal" do
 				Piece_Color = Struct.new(:color)
 				board = Board.new(grid: [[Piece_Color.new("white"),Piece_Color.new("black"),Piece_Color.new("white")]])
-				expect(board.is_enemy?([0,0],[0,1])).to be_truthy
+				expect(board.is_enemy?([0,0],[0,1])).to be true
 			end
 		end
 
@@ -80,26 +80,26 @@ module Chess
 			it "returns true if piece can move there" do
 				Valid_Moves = Struct.new(:valid_moves)
 				board = Board.new(grid: [[Value.new(Valid_Moves.new([[5,5]]))]])
-				expect(board.is_valid_move?([0,0],[5,5])).to be_truthy
+				expect(board.is_valid_move?([0,0],[5,5])).to be true
 			end
 
 			it "returns false if piece cannot move there" do
 				board = Board.new(grid: [[Value.new(Valid_Moves.new([[1,1]]))]])
-				expect(board.is_valid_move?([0,0],[5,5])).to be_falsey
+				expect(board.is_valid_move?([0,0],[5,5])).to be false
 			end
 		end
 
 		context "#horizontal_movement_check" do
 			it "returns true if piece is unhindered horizontally either direction" do
 				board = Board.new(grid: [[Value.new(""),Value.new(""),Value.new("")]])
-				expect(board.horizontal_movement_check([0,0],[0,2])).to be_truthy
-				expect(board.horizontal_movement_check([0,2],[0,0])).to be_truthy
+				expect(board.horizontal_movement_check([0,0],[0,2])).to be true
+				expect(board.horizontal_movement_check([0,2],[0,0])).to be true
 			end
 
 			it "returns false if piece is hindered horizontally either direction" do
 				board = Board.new(grid: [[Value.new(""),Value.new("Occupied"),Value.new("")]])
-				expect(board.horizontal_movement_check([0,0],[0,2])).to be_falsey
-				expect(board.horizontal_movement_check([0,2],[0,0])).to be_falsey
+				expect(board.horizontal_movement_check([0,0],[0,2])).to be false
+				expect(board.horizontal_movement_check([0,2],[0,0])).to be false
 			end
 		end
 
@@ -108,16 +108,16 @@ module Chess
 				board = Board.new(grid: [[Value.new("")],
 										 [Value.new("")],
 										 [Value.new("")]])
-				expect(board.vertical_movement_check([0,0],[2,0])).to be_truthy
-				expect(board.vertical_movement_check([2,0],[0,0])).to be_truthy
+				expect(board.vertical_movement_check([0,0],[2,0])).to be true
+				expect(board.vertical_movement_check([2,0],[0,0])).to be true
 			end
 
 			it "returns false if piece is hindered vertically either direction" do
 				board = Board.new(grid: [[Value.new("")],
 										 [Value.new("Occupied")],
 										 [Value.new("")]])
-				expect(board.vertical_movement_check([0,0],[2,0])).to be_falsey
-				expect(board.vertical_movement_check([2,0],[0,0])).to be_falsey
+				expect(board.vertical_movement_check([0,0],[2,0])).to be false
+				expect(board.vertical_movement_check([2,0],[0,0])).to be false
 			end
 		end
 
@@ -126,50 +126,55 @@ module Chess
 				board = Board.new(grid: [[Value.new(""),Value.new(""),Value.new("")],
 										 [Value.new(""),Value.new(""),Value.new("")],
 										 [Value.new(""),Value.new(""),Value.new("")]])
-				expect(board.diagonal_movement_check([0,0],[2,2])).to be_truthy
-				expect(board.diagonal_movement_check([2,2],[0,0])).to be_truthy
-				expect(board.diagonal_movement_check([0,2],[2,0])).to be_truthy
-				expect(board.diagonal_movement_check([2,0],[0,2])).to be_truthy
+				expect(board.diagonal_movement_check([0,0],[2,2])).to be true
+				expect(board.diagonal_movement_check([2,2],[0,0])).to be true
+				expect(board.diagonal_movement_check([0,2],[2,0])).to be true
+				expect(board.diagonal_movement_check([2,0],[0,2])).to be true
 			end
 
 			it "returns false if piece is hindered diagonally in any direction" do
 				board = Board.new(grid: [[Value.new(""),Value.new(""),Value.new("")],
 										 [Value.new(""),Value.new("Occupied"),Value.new("")],
 										 [Value.new(""),Value.new(""),Value.new("")]])
-				expect(board.diagonal_movement_check([0,0],[2,2])).to be_falsey
-				expect(board.diagonal_movement_check([2,2],[0,0])).to be_falsey
-				expect(board.diagonal_movement_check([0,2],[2,0])).to be_falsey
-				expect(board.diagonal_movement_check([2,0],[0,2])).to be_falsey
+				expect(board.diagonal_movement_check([0,0],[2,2])).to be false
+				expect(board.diagonal_movement_check([2,2],[0,0])).to be false
+				expect(board.diagonal_movement_check([0,2],[2,0])).to be false
+				expect(board.diagonal_movement_check([2,0],[0,2])).to be false
 			end		
 		end
+=begin
+		contect "#direction_check" do
+			it "checks diagonally if row and column mismatch" do
+				board = Board.new
 
+=end
 		context "#check_move" do
 			let(:board) { Board.new }
 			it "returns true if move is valid and square is unoccupied" do
 				allow(board).to receive(:is_valid_move?) { true }
 				allow(board).to receive(:is_unoccupied?) { true }
-				expect(board.check_move("this","that")).to be_truthy
+				expect(board.check_move("this","that")).to be true
 			end
 
 			it "returns true if move is valid and square is an enemy" do
 				allow(board).to receive(:is_valid_move?) { true }
 				allow(board).to receive(:is_unoccupied?) { false }
 				allow(board).to receive(:is_enemy?) { true }
-				expect(board.check_move("this","that")).to be_truthy
+				expect(board.check_move("this","that")).to be true
 			end
 
 			it "returns false if move is not valid" do
 				allow(board).to receive(:is_valid_move?) { false }
 				allow(board).to receive(:is_unoccupied?) { true }
 				allow(board).to receive(:is_enemy?) { true }
-				expect(board.check_move("this","that")).to be_falsey
+				expect(board.check_move("this","that")).to be false
 			end
 
 			it "returns false if move is valid and square is not an enemy" do
 				allow(board).to receive(:is_valid_move?) { true }
 				allow(board).to receive(:is_unoccupied?) { false }
 				allow(board).to receive(:is_enemy?) { false }
-				expect(board.check_move("this","that")).to be_falsey
+				expect(board.check_move("this","that")).to be false
 			end
 		end
 
@@ -191,7 +196,7 @@ module Chess
 				board = Board.new
 				allow(board).to receive(:winner?) { false }
 				allow(board).to receive(:draw?) { false }
-				expect(board.game_over).to eq false
+				expect(board.game_over).to be false
 			end
 		end
 	end
