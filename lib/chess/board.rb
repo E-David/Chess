@@ -3,6 +3,16 @@ module Chess
 		attr_reader :grid
 		def initialize(input = {})
 			@grid = input.fetch(:grid, default_board)
+			coordinate_board
+			colorize_board
+			test_board
+		end
+
+		def test_board
+			set_square([1,1], Pawn.new("black",[1,1]))
+			set_square([2,1], Pawn.new("white",[2,1]))
+			set_square([2,0], Pawn.new("white",[2,0]))
+			set_square([2,2], Pawn.new("white",[2,2]))
 		end
 
 		def coordinate_board
