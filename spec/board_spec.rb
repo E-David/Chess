@@ -142,12 +142,37 @@ module Chess
 				expect(board.diagonal_movement_check([2,0],[0,2])).to be false
 			end		
 		end
-=begin
-		contect "#direction_check" do
-			it "checks diagonally if row and column mismatch" do
-				board = Board.new
 
-=end
+		context "#direction_check" do
+			let(:board) { Board.new }
+			it "checks diagonally if row and column mismatch" do
+				foo = [0,1]
+				bar = [1,0]
+				allow(board).to receive(:direction_check).with(foo,bar)
+				board.diagonal_movement_check(foo,bar)
+			end
+
+			it "checks vertically if only row mismatch" do
+				foo = [0,0]
+				bar = [1,0]
+				allow(board).to receive(:direction_check).with(foo,bar)
+				board.vertical_movement_check(foo,bar)
+			end
+
+			it "checks horizontally if only column mismatch" do
+				foo = [0,0]
+				bar = [0,1]
+				allow(board).to receive(:direction_check).with(foo,bar)
+				board.horizontal_movement_check(foo,bar)
+			end
+
+			it "throws error if no mismatch exists" do
+				foo = [0,0]
+				bar = [0,0]
+				expect { board.direction_check(foo,bar) }.to raise_error("Movement Error")
+			end
+		end
+
 		context "#check_move" do
 			let(:board) { Board.new }
 			it "returns true if move is valid and square is unoccupied" do
@@ -161,13 +186,6 @@ module Chess
 				allow(board).to receive(:is_unoccupied?) { false }
 				allow(board).to receive(:is_enemy?) { true }
 				expect(board.check_move("this","that")).to be true
-			end
-
-			it "returns false if move is not valid" do
-				allow(board).to receive(:is_valid_move?) { false }
-				allow(board).to receive(:is_unoccupied?) { true }
-				allow(board).to receive(:is_enemy?) { true }
-				expect(board.check_move("this","that")).to be false
 			end
 
 			it "returns false if move is valid and square is not an enemy" do

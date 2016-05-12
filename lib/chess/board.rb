@@ -74,11 +74,10 @@ module Chess
 		end
 
 		def direction_check(move_from, move_to)
-			if (move_from[0] != move_to[0] && move_from[1] != move_to[1])
-				return diagonal_movement_check(move_from,move_to)
-			else
-				move_from[0] != move_to[0] ? (return vertical_movement_check) : (return horizontal_movement_check)
-			end
+			return diagonal_movement_check(move_from,move_to) if (move_from[0] != move_to[0] && move_from[1] != move_to[1])
+			return vertical_movement_check(move_from,move_to) if move_from[0] != move_to[0] 
+			return horizontal_movement_check(move_from,move_to) if move_from[1] != move_to[1]
+			raise "Movement Error"
 		end
 
 		def check_move(move_from, move_to)
