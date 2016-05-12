@@ -81,13 +81,10 @@ module Chess
 		end
 
 		def check_move(move_from, move_to)
-			if is_valid_move?(move_from, move_to)
-				if (is_unoccupied?(move_to) || is_enemy?(move_from,move_to))
-					true
-				else
-					false
-				end
-			end
+			return false unless is_valid_move?(move_from, move_to)
+			return false unless (is_unoccupied?(move_to) || is_enemy?(move_from,move_to))
+			return false unless direction_check(move_from,move_to)
+			true
 		end
 
 		def game_over

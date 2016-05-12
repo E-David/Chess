@@ -175,23 +175,41 @@ module Chess
 
 		context "#check_move" do
 			let(:board) { Board.new }
-			it "returns true if move is valid and square is unoccupied" do
-				allow(board).to receive(:is_valid_move?) { true }
-				allow(board).to receive(:is_unoccupied?) { true }
+			let(:valid_move) { allow(board).to receive(:is_valid_move?) { true } }
+			let(:invalid_move) { allow(board).to receive(:is_valid_move?) { false } }
+			let(:unoccupied) { allow(board).to receive(:is_unoccupied?) { true } }
+			let(:occupied) { allow(board).to receive(:is_unoccupied?) { false } }
+			let(:enemy_piece) { allow(board).to receive(:is_enemy?) { true } }
+			let(:ally_piece) { allow(board).to receive(:is_enemy?) { false } }
+			let(:unhindered_move) { allow(board).to receive(:direction_check) { true } }
+			let(:hindered_move) { allow(board).to receive(:direction_check) { false } }
+			it "returns true if move is valid, square is unoccupied, and move is unhindered" do
+				valid_move && unoccupied && unhindered_move
 				expect(board.check_move("this","that")).to be true
 			end
 
-			it "returns true if move is valid and square is an enemy" do
-				allow(board).to receive(:is_valid_move?) { true }
-				allow(board).to receive(:is_unoccupied?) { false }
-				allow(board).to receive(:is_enemy?) { true }
+			it "returns true if move is valid, square is an enemy, and move is unhindered" do
+				valid_move && occupied && enemy_piece && unhindered_move
 				expect(board.check_move("this","that")).to be true
+			end
+
+			it "returns false if move is invalid" do
+				invalid_move && unoccupied && unhindered_move
+				expect(board.check_move("this","that")).to be false
 			end
 
 			it "returns false if move is valid and square is not an enemy" do
-				allow(board).to receive(:is_valid_move?) { true }
-				allow(board).to receive(:is_unoccupied?) { false }
-				allow(board).to receive(:is_enemy?) { false }
+				valid_move && occupied && ally_piece && unhindered_move
+				expect(board.check_move("this","that")).to be false
+			end
+
+			it "returns false if move is valid and square is unoccupied, but move is hindered" do
+				valid_move && unoccupied && hindered_move
+				expect(board.check_move("this","that")).to be false
+			end
+
+			it "returns false if move is valid and square is an enemy, but move is hindered" do
+				valid_move && occupied && enemy_piece && hindered_move
 				expect(board.check_move("this","that")).to be false
 			end
 		end
