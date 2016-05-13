@@ -3,9 +3,6 @@ module Chess
 		attr_reader :grid
 		def initialize(input = {})
 			@grid = input.fetch(:grid, default_board)
-			coordinate_board
-			colorize_board
-			test_board
 		end
 
 		def test_board
@@ -13,6 +10,7 @@ module Chess
 			set_square([2,1], Pawn.new("white",[2,1]))
 			set_square([2,0], Pawn.new("white",[2,0]))
 			set_square([2,2], Pawn.new("white",[2,2]))
+			set_square([1,3], Pawn.new("white",[1,3]))
 		end
 
 		def coordinate_board
@@ -55,32 +53,44 @@ module Chess
 		def horizontal_movement_check(move_from, move_to)
 			row = move_from[0]
 			col = move_from[1]
+			unhindered = true
 			until col == move_to[1]
 				col > move_to[1] ? col -= 1 : col += 1
-				break if is_unoccupied?([row,col]) == false
+				if is_unoccupied?([row,col]) == false && col != move_to[1]
+					unhindered = false
+					break
+				end
 			end
-			return is_unoccupied?([row,col])
+			return unhindered
 		end
 
 		def vertical_movement_check(move_from, move_to)
 			row = move_from[0]
 			col = move_from[1]
+			unhindered = true
 			until row == move_to[0]
 				row > move_to[0] ? row -= 1 : row += 1
-				break if is_unoccupied?([row,col]) == false
+				if is_unoccupied?([row,col]) == false && row != move_to[0]
+					unhindered = false
+					break
+				end
 			end
-			return is_unoccupied?([row,col])
+			return unhindered
 		end
 
 		def diagonal_movement_check(move_from, move_to)
 			row = move_from[0]
 			col = move_from[1]
+			unhindered = true
 			until (row == move_to[0]) && (col == move_to[1])
 				row > move_to[0] ? row -= 1 : row += 1
 				col > move_to[1] ? col -= 1 : col += 1
-				break if is_unoccupied?([row,col]) == false
+				if is_unoccupied?([row,col]) == false && col != move_to[1] && row != move_to[0]
+					unhindered = false
+					break
+				end
 			end
-			return is_unoccupied?([row,col])
+			return unhindered
 		end
 
 		def direction_check(move_from, move_to)
@@ -91,10 +101,20 @@ module Chess
 		end
 
 		def check_move(move_from, move_to)
-			return false unless is_valid_move?(move_from, move_to)
-			return false unless (is_unoccupied?(move_to) || is_enemy?(move_from,move_to))
-			return false unless direction_check(move_from,move_to)
-			true
+			message = "good move"
+			unless is_valid_move?(move_from, move_to)
+				message = "Invalid move"
+				
+			end
+			unless !is_enemy?(move_from,move_to)
+				message = "Allied piece"
+				
+			end
+			unless direction_check(move_from,move_to)
+				message = "Hindered movement"
+				
+			end
+			p message
 		end
 
 		def game_over
