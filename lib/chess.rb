@@ -8,3 +8,6 @@ module Chess
 	require_relative "./chess/game.rb"
 	require_relative "./chess/core_extensions.rb"
 end
+
+x = Chess::King.new("black", [0,2])
+p x
