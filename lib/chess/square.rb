@@ -10,10 +10,8 @@ module Chess
 		def to_s
 			string = ""
 			string += "coordinates: #{self.coordinate}"
-			string += ", color: #{self.color}"
-			string += ", piece: #{self.value.class}" if self.value != ""
-			string += ", piece_details: #{self.value.valid_moves}" if self.value != ""
-			p string
+			string += ", square color: #{self.color}"
+			return string
 		end
 	end
 end

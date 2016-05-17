@@ -33,6 +33,15 @@ module Chess
 			end
 			move_list
 		end
+
+		def to_s
+			string = ""
+			module_name = "#{self.class.name}"
+			string += module_name.gsub(/(Chess::)/,"")
+			string += ", piece color: #{self.color}"
+			#string += ", piece valid moves #{self.valid_moves}"
+			return string
+		end
 	end
 
 		class Pawn < Piece
@@ -43,10 +52,7 @@ module Chess
 			end
 
 			def to_s
-				string = ""
-				string += "#{self.color}"
-				string += "#{self.valid_moves}"
-				return string
+				super
 			end
 
 			def possible_moves
@@ -62,7 +68,7 @@ module Chess
 			end
 
 			def first_move?
-				color == "black" && position[1] == 1 || color == "white" && position[1] == 6
+				color == "black" && position[0] == 1 || color == "white" && position[0] == 6
 			end
 
 			#creates new array of each possible movement plus the current position
@@ -83,10 +89,7 @@ module Chess
 			end
 
 			def to_s
-				string = ""
-				string += "#{self.color}"
-				string += "#{self.valid_moves}"
-				return string
+				super
 			end
 
 			def possible_moves
@@ -113,10 +116,7 @@ module Chess
 			end
 
 			def to_s
-				string = ""
-				string += "#{self.color}"
-				string += "#{self.valid_moves}"
-				return string
+				super
 			end
 
 			def possible_moves
@@ -142,10 +142,7 @@ module Chess
 			end
 
 			def to_s
-				string = ""
-				string += "#{self.color}"
-				string += "#{self.valid_moves}"
-				return string
+				super
 			end
 
 			def possible_moves
@@ -166,10 +163,7 @@ module Chess
 			end
 
 			def to_s
-				string = ""
-				string += "#{self.color}"
-				string += "#{self.valid_moves}"
-				return string
+				super
 			end
 
 			def possible_moves
@@ -201,10 +195,7 @@ module Chess
 			end
 
 			def to_s
-				string = ""
-				string += "#{self.color}"
-				string += "#{self.valid_moves}"
-				return string
+				super
 			end
 
 			def possible_moves

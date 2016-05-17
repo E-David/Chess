@@ -3,14 +3,57 @@ module Chess
 		attr_reader :grid
 		def initialize(input = {})
 			@grid = input.fetch(:grid, default_board)
+			setup_board
 		end
 
-		def test_board
-			set_square([1,1], Pawn.new("black",[1,1]))
-			set_square([2,1], Pawn.new("white",[2,1]))
-			set_square([2,0], Pawn.new("white",[2,0]))
-			set_square([2,2], Pawn.new("white",[2,2]))
-			set_square([1,3], Pawn.new("white",[1,3]))
+		def to_s
+			string = ""
+			grid.each do |row| 
+				row.each do |square| 
+					string += square.to_s
+					string += ", " if square.value != ""
+					string += square.value.to_s
+					string += "\n"
+				end
+			end
+			return string
+		end
+
+		def setup_board
+			coordinate_board
+			colorize_board
+			setup_pawns
+			setup_back_rows
+		end
+
+		def setup_pawns
+			(0..7).each do |col| 
+				set_square([1,col], Pawn.new("black",[1,col]))
+				set_square([6,col], Pawn.new("white",[6,col]))
+			end
+		end
+
+		def setup_back_rows
+			(0..7).each do |col| 
+				case col 
+				when 0 
+					set_square([0,col], Rook.new("black",[0,col])) ; set_square([7,col], Rook.new("white",[7,col]))
+				when 1
+					set_square([0,col], Knight.new("black",[0,col])) ; set_square([7,col], Knight.new("white",[7,col]))
+				when 2
+					set_square([0,col], Bishop.new("black",[0,col])) ; set_square([7,col], Bishop.new("white",[7,col]))
+				when 3
+					set_square([0,col], King.new("black",[0,col])) ; set_square([7,col], King.new("white",[7,col]))
+				when 4
+					set_square([0,col], Queen.new("black",[0,col])) ; set_square([7,col], Queen.new("white",[7,col]))
+				when 5
+					set_square([0,col], Bishop.new("black",[0,col])) ; set_square([7,col], Bishop.new("white",[7,col]))
+				when 6
+					set_square([0,col], Knight.new("black",[0,col])) ; set_square([7,col], Knight.new("white",[7,col]))
+				when 7
+					set_square([0,col], Rook.new("black",[0,col])) ; set_square([7,col], Rook.new("white",[7,col]))
+				end
+			end
 		end
 
 		def coordinate_board

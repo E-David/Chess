@@ -9,5 +9,5 @@ module Chess
 	require_relative "./chess/core_extensions.rb"
 end
 
-x = Chess::King.new("black", [0,2])
-p x
+x = Chess::Board.new
+puts x.to_s
