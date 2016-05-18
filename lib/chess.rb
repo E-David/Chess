@@ -10,4 +10,4 @@ module Chess
 end
 
 x = Chess::Board.new
-puts x.to_s
+x.display_board

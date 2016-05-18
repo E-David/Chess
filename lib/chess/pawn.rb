@@ -45,9 +45,10 @@ module Chess
 	end
 
 		class Pawn < Piece
-			attr_reader :valid_moves, :position
+			attr_reader :valid_moves, :position, :unicode_char
 			def initialize(color, position)
 				super(color, position)
+				@unicode_char = color == "black" ? "\u265F" : "\u2659"
 				@valid_moves = validate_move
 			end
 
@@ -82,9 +83,10 @@ module Chess
 		end
 
 		class Rook < Piece
-			attr_reader :valid_moves, :position
+			attr_reader :valid_moves, :position, :unicode_char
 			def initialize(color, position)
 				super(color, position)
+				@unicode_char = color == "black" ? "\u265C" : "\u2656"
 				@valid_moves = possible_moves
 			end
 
@@ -109,9 +111,10 @@ module Chess
 		end
 
 		class Knight < Piece
-			attr_reader :valid_moves, :position
+			attr_reader :valid_moves, :position, :unicode_char
 			def initialize(color, position)
 				super(color, position)
+				@unicode_char = color == "black" ? "\u265E" : "\u2658"
 				@valid_moves = validate_move
 			end
 
@@ -135,9 +138,10 @@ module Chess
 		end
 		
 		class Bishop < Piece
-			attr_reader :valid_moves, :position
+			attr_reader :valid_moves, :position, :unicode_char
 			def initialize(color, position)
 				super(color, position)
+				@unicode_char = color == "black" ? "\u265D" : "\u2657"
 				@valid_moves = possible_moves
 			end
 
@@ -156,9 +160,10 @@ module Chess
 		end
 
 		class Queen < Piece
-			attr_reader :valid_moves, :position
+			attr_reader :valid_moves, :position, :unicode_char
 			def initialize(color, position)
 				super(color, position)
+				@unicode_char = color == "black" ? "\u265B" : "\u2655"
 				@valid_moves = possible_moves
 			end
 
@@ -188,9 +193,10 @@ module Chess
 		end
 		
 		class King < Piece
-			attr_reader :valid_moves, :position
+			attr_reader :valid_moves, :position, :unicode_char
 			def initialize(color, position)
 				super(color, position)
+				@unicode_char = color == "black" ? "\u265A" : "\u2654"
 				@valid_moves = validate_move
 			end
 

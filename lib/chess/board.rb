@@ -43,9 +43,9 @@ module Chess
 				when 2
 					set_square([0,col], Bishop.new("black",[0,col])) ; set_square([7,col], Bishop.new("white",[7,col]))
 				when 3
-					set_square([0,col], King.new("black",[0,col])) ; set_square([7,col], King.new("white",[7,col]))
-				when 4
 					set_square([0,col], Queen.new("black",[0,col])) ; set_square([7,col], Queen.new("white",[7,col]))
+				when 4
+					set_square([0,col], King.new("black",[0,col])) ; set_square([7,col], King.new("white",[7,col]))
 				when 5
 					set_square([0,col], Bishop.new("black",[0,col])) ; set_square([7,col], Bishop.new("white",[7,col]))
 				when 6
@@ -65,7 +65,26 @@ module Chess
 		end
 
 		def colorize_board
-			grid.flatten.each_with_index { |square, index| index.odd? ? square.color = "black" : square.color = "white" }
+			grid.each_with_index do |row, row_index| 
+				row.each_with_index do |square, col_index|
+					if row_index.even?
+						col_index.even? ? square.color = "black" : square.color = "white"
+					else
+						col_index.even? ? square.color = "white" : square.color = "black"
+					end
+				end
+			end
+		end
+
+		def display_board
+			grid.each do |row|
+				display = ""
+				row.each do |square|
+					piece_display = square.value == "" ? "  " : square.value.unicode_char
+					display += square.color == "black" ? "I #{piece_display} I" : "| #{piece_display} |"
+				end
+				puts display
+			end
 		end
 
 		def get_square(coordinate)
