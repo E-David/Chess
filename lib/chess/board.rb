@@ -109,7 +109,8 @@ module Chess
 
 		def is_valid_move?(move_from, move_to)
 			valid_moves = get_piece(move_from).valid_moves
-			valid_moves.include? (move_to)
+			#if get_piece(move_from).piece_name == "Pawn"
+				valid_moves.include? (move_to)
 		end
 
 		def horizontal_movement_check(move_from, move_to)

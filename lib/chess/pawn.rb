@@ -1,9 +1,10 @@
 module Chess
 	class Piece
-		attr_reader :color, :position
+		attr_reader :color, :position, :piece_name
 		def initialize(color, position)
 			@color = color
 			@position = position
+			@piece_name = self.class.name.gsub(/(Chess::)/,"")
 		end
 
 		def horizontal_moves
@@ -36,8 +37,7 @@ module Chess
 
 		def to_s
 			string = ""
-			module_name = "#{self.class.name}"
-			string += module_name.gsub(/(Chess::)/,"")
+			string += "piece name: #{self.piece_name}"
 			string += ", piece color: #{self.color}"
 			#string += ", piece valid moves #{self.valid_moves}"
 			return string
