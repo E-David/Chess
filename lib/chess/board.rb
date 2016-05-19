@@ -104,13 +104,31 @@ module Chess
 		end
 
 		def is_enemy?(move_from,move_to)
-			get_square(move_from).color != get_square(move_to).color
+			get_piece(move_from).color != get_piece(move_to).color
 		end
 
-		def is_valid_move?(move_from, move_to)
-			valid_moves = get_piece(move_from).valid_moves
-			#if get_piece(move_from).piece_name == "Pawn"
-				valid_moves.include? (move_to)
+		def is_valid_move?(move_from,move_to)
+			piece = get_piece(move_from)
+			if piece.piece_name == "Pawn"
+				pawn_diagonal_check(move_from,move_to) 
+			else
+				piece.valid_moves.include?(move_to)
+			end
+		end
+
+		def is_knight?(coordinate)
+			piece = get_piece(coordinate)
+			return piece.piece_name == "Knight"
+		end
+
+		# 1. check if movement is in a different row ([0]) and column ([1]), supplied by is_valid_move? method
+		# 2. If not, pawn is going forward, check that move is valid and unhindered
+		def pawn_diagonal_check(move_from,move_to)
+			if (move_from[0] != move_to[0] && move_from[1] != move_to[1])
+				is_enemy?(move_from,move_to)
+			else
+				get_piece(move_from).valid_moves.include?(move_to) && is_unoccupied?(move_to)
+			end
 		end
 
 		def horizontal_movement_check(move_from, move_to)
@@ -165,17 +183,19 @@ module Chess
 
 		def check_move(move_from, move_to)
 			message = "good move"
-			unless is_valid_move?(move_from, move_to)
+			unless is_valid_move?(move_from,move_to)
 				message = "Invalid move"
-				
+				return p message
 			end
+
 			unless !is_enemy?(move_from,move_to)
 				message = "Allied piece"
-				
+				return p message
 			end
-			unless direction_check(move_from,move_to)
+
+			unless direction_check(move_from,move_to) && is_knight? == false
 				message = "Hindered movement"
-				
+				return p message
 			end
 			p message
 		end
