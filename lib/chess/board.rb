@@ -131,73 +131,53 @@ module Chess
 			end
 		end
 
-		def horizontal_movement_check(move_from, move_to)
+		def path_check(move_from,move_to,direction)
 			row = move_from[0]
 			col = move_from[1]
 			unhindered = true
-			until col == move_to[1]
-				col > move_to[1] ? col -= 1 : col += 1
-				if is_unoccupied?([row,col]) == false && col != move_to[1]
-					unhindered = false
-					break
+			case direction
+			when "horizontal"
+				until col == move_to[1]
+					col > move_to[1] ? col -= 1 : col += 1
+					if is_unoccupied?([row,col]) == false && col != move_to[1]
+						unhindered = false
+						break
+					end
 				end
-			end
-			return unhindered
-		end
-
-		def vertical_movement_check(move_from, move_to)
-			row = move_from[0]
-			col = move_from[1]
-			unhindered = true
-			until row == move_to[0]
-				row > move_to[0] ? row -= 1 : row += 1
-				if is_unoccupied?([row,col]) == false && row != move_to[0]
-					unhindered = false
-					break
+			when "vertical"
+				until row == move_to[0]
+					row > move_to[0] ? row -= 1 : row += 1
+					if is_unoccupied?([row,col]) == false && row != move_to[0]
+						unhindered = false
+						break
+					end
 				end
-			end
-			return unhindered
-		end
-
-		def diagonal_movement_check(move_from, move_to)
-			row = move_from[0]
-			col = move_from[1]
-			unhindered = true
-			until (row == move_to[0]) && (col == move_to[1])
-				row > move_to[0] ? row -= 1 : row += 1
-				col > move_to[1] ? col -= 1 : col += 1
-				if is_unoccupied?([row,col]) == false && col != move_to[1] && row != move_to[0]
-					unhindered = false
-					break
+			when "diagonal"
+				until (row == move_to[0]) && (col == move_to[1])
+					row > move_to[0] ? row -= 1 : row += 1
+					col > move_to[1] ? col -= 1 : col += 1
+					if is_unoccupied?([row,col]) == false && col != move_to[1] && row != move_to[0]
+						unhindered = false
+						break
+					end
 				end
 			end
 			return unhindered
 		end
 
 		def direction_check(move_from, move_to)
-			return diagonal_movement_check(move_from,move_to) if (move_from[0] != move_to[0] && move_from[1] != move_to[1])
-			return vertical_movement_check(move_from,move_to) if move_from[0] != move_to[0] 
-			return horizontal_movement_check(move_from,move_to) if move_from[1] != move_to[1]
+			return true if is_knight?(move_from)
+			return path_check(move_from,move_to,"diagonal") if (move_from[0] != move_to[0] && move_from[1] != move_to[1])
+			return path_check(move_from,move_to,"vertical") if move_from[0] != move_to[0] 
+			return path_check(move_from,move_to,"horizontal") if move_from[1] != move_to[1]
 			raise "Movement Error"
 		end
 
 		def check_move(move_from, move_to)
-			message = "good move"
-			unless is_valid_move?(move_from,move_to)
-				message = "Invalid move"
-				return p message
-			end
-
-			unless !is_enemy?(move_from,move_to)
-				message = "Allied piece"
-				return p message
-			end
-
-			unless direction_check(move_from,move_to) && is_knight? == false
-				message = "Hindered movement"
-				return p message
-			end
-			p message
+			return "Invalid move" if is_valid_move?(move_from,move_to) == false
+			return "Target destination is an ally" if (is_unoccupied?(move_to) == false && is_enemy?(move_from,move_to) == false)
+			return "Move is blocked by another piece" if (direction_check(move_from,move_to) == false)
+			true
 		end
 
 		def game_over
