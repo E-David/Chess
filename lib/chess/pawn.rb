@@ -1,7 +1,7 @@
 module Chess
 	class Piece
 		attr_reader :color, :position, :piece_name
-		def initialize(color, position)
+		def initialize(color, position=[])
 			@color = color
 			@position = position
 			@piece_name = self.class.name.gsub(/(Chess::)/,"")
@@ -78,7 +78,7 @@ module Chess
 			end
 
 			def validate_move
-				available_moves.select { |move| move.all? { |x| x >= 0 && x <= 7 } }
+				valid_moves = available_moves.select { |move| move.all? { |x| x >= 0 && x <= 7 } }
 			end
 		end
 

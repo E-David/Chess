@@ -99,6 +99,45 @@ module Chess
 			get_square(coordinate).value = piece
 		end
 
+		def all_pieces
+			all_pieces = []
+			grid.each do |row|
+				filled_squares = []
+				filled_squares = row.select { |square| square.value != ""}
+				filled_squares.each { |square| all_pieces << square.value}
+			end
+			all_pieces
+		end
+
+		def all_moves
+			all_moves = []
+			all_pieces.each { |piece| piece.valid_moves.each { |move| all_moves << move if !all_moves.include?(move)}}
+			all_moves.sort
+		end
+
+		def get_kings
+			king_positions = []
+			all_pieces.each { |piece| king_positions << piece.position if piece.piece_name == "King" }
+			king_positions
+		end
+
+		def check(king_position)
+			attacking_pieces = all_pieces.select { |piece| piece.valid_moves.include?(king_position) }
+			attacking_pieces.any? { |piece| check_move(piece.position,king_position) == true }
+		end
+
+		def checkmate(king)
+			king.valid_moves.any? { |move| check(move) == false } ? "YOU DON'T LOSE" : "YOU LOSE"
+		end
+
+		def game_done(king)
+			king_position = king.position
+			if check(king_position)
+				p "UH OH"
+				p checkmate(king)
+			end
+		end
+
 		def is_unoccupied?(coordinate)
 			get_square(coordinate).value == ""
 		end

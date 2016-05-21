@@ -10,5 +10,5 @@ module Chess
 end
 
 x = Chess::Board.new
-x.set_square([5,0], Chess::Rook.new("black",[5,0]))
-puts x.check_move([7,1],[5,0])
+king = x.set_square([5,0], Chess::King.new("black",[5,0]))
+x.game_done(king)
