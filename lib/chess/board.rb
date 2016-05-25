@@ -95,47 +95,33 @@ module Chess
 			get_square(coordinate).value
 		end
 
-		def set_square(coordinate,piece)
-			get_square(coordinate).value = piece
-		end
-
 		def all_pieces
 			all_pieces = []
-			grid.each do |row|
-				filled_squares = []
-				filled_squares = row.select { |square| square.value != ""}
-				filled_squares.each { |square| all_pieces << square.value}
-			end
+			grid.each { |row| row.each { |square| all_pieces << square.value if square.value != "" }}
 			all_pieces
 		end
 
-		def all_moves
-			all_moves = []
-			all_pieces.each { |piece| piece.valid_moves.each { |move| all_moves << move if !all_moves.include?(move)}}
-			all_moves.sort
-		end
-
 		def get_kings
-			king_positions = []
-			all_pieces.each { |piece| king_positions << piece.position if piece.piece_name == "King" }
-			king_positions
+			all_pieces.select { |piece| piece.piece_name == "King" }
 		end
 
-		def check(king_position)
-			attacking_pieces = all_pieces.select { |piece| piece.valid_moves.include?(king_position) }
-			attacking_pieces.any? { |piece| check_move(piece.position,king_position) == true }
+		def check
+			kings = get_kings
+			kings.each do |king| 
+				king.check_moves.each do |check_move| 
+					if is_enemy?(king.position,check_move)
+						return king if king_direction_check(king,check_move)
+					end
+				end
+			end			
 		end
 
-		def checkmate(king)
-			king.valid_moves.any? { |move| check(move) == false } ? "YOU DON'T LOSE" : "YOU LOSE"
+		def king_direction_check(king,enemy)
+			enemy.any? { |ene| is_knight?(ene) || direction_check(king.position,ene) }
 		end
 
-		def game_done(king)
-			king_position = king.position
-			if check(king_position)
-				p "UH OH"
-				p checkmate(king)
-			end
+		def set_square(coordinate,piece)
+			get_square(coordinate).value = piece
 		end
 
 		def is_unoccupied?(coordinate)
@@ -143,6 +129,7 @@ module Chess
 		end
 
 		def is_enemy?(move_from,move_to)
+			return false if is_unoccupied?(move_to)
 			get_piece(move_from).color != get_piece(move_to).color
 		end
 
@@ -170,45 +157,52 @@ module Chess
 			end
 		end
 
-		def path_check(move_from,move_to,direction)
-			row = move_from[0]
-			col = move_from[1]
+		def horizontal_path(row_from,col_from,col_to)
 			unhindered = true
-			case direction
-			when "horizontal"
-				until col == move_to[1]
-					col > move_to[1] ? col -= 1 : col += 1
-					if is_unoccupied?([row,col]) == false && col != move_to[1]
+			until col_from == col_to
+					col_from > col_to ? col_from -= 1 : col_from += 1
+					if is_unoccupied?([row_from,col_from]) == false && col_from != col_to
 						unhindered = false
 						break
 					end
 				end
-			when "vertical"
-				until row == move_to[0]
-					row > move_to[0] ? row -= 1 : row += 1
-					if is_unoccupied?([row,col]) == false && row != move_to[0]
+			return unhindered
+		end
+
+		def vertical_path(row_from,col_from,row_to)
+			unhindered = true
+			until row_from == row_to
+					row_from > row_to ? row_from -= 1 : row_from += 1
+					if is_unoccupied?([row_from,col_from]) == false && row_from != row_to
 						unhindered = false
 						break
 					end
 				end
-			when "diagonal"
-				until (row == move_to[0]) && (col == move_to[1])
-					row > move_to[0] ? row -= 1 : row += 1
-					col > move_to[1] ? col -= 1 : col += 1
-					if is_unoccupied?([row,col]) == false && col != move_to[1] && row != move_to[0]
-						unhindered = false
-						break
-					end
+			return unhindered
+		end
+
+		def diagonal_path(row_from,col_from,row_to,col_to)
+			unhindered = true
+			until (row_from == row_to) && (col_from == col_to)
+				row_from > row_to ? row_from -= 1 : row_from += 1
+				col_from > col_to ? col_from -= 1 : col_from += 1
+				if is_unoccupied?([row_from,col_from]) == false && col_from != col_to && row_from != row_to
+					unhindered = false
+					break
 				end
 			end
 			return unhindered
 		end
 
 		def direction_check(move_from, move_to)
+			row_from = move_from[0]
+			col_from = move_from[1]
+			row_to = move_to[0]
+			col_to = move_to[1]
 			return true if is_knight?(move_from)
-			return path_check(move_from,move_to,"diagonal") if (move_from[0] != move_to[0] && move_from[1] != move_to[1])
-			return path_check(move_from,move_to,"vertical") if move_from[0] != move_to[0] 
-			return path_check(move_from,move_to,"horizontal") if move_from[1] != move_to[1]
+			return diagonal_path(row_from,col_from,row_to,col_to) if (row_from != row_to && col_from != col_to)
+			return vertical_path(row_from,col_from,row_to) if row_from != row_to 
+			return horizontal_path(row_from,col_from,row_to) if col_from != col_to
 			raise "Movement Error"
 		end
 
