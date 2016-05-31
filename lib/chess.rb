@@ -10,4 +10,6 @@ module Chess
 end
 
 x = Chess::Board.new
-puts x.get_kings
+x.set_square([0,2], Chess::King.new("white",[0,2]))
+king = x.get_king("white")[0]
+p x.check(king)
