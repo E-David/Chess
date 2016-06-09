@@ -1,8 +1,10 @@
 module Chess
 	class Board
+		attr_accessor :check_pieces
 		attr_reader :grid
 		def initialize(input = {})
 			@grid = input.fetch(:grid, default_board)
+			@check_pieces = check_pieces
 			setup_board
 		end
 
@@ -106,13 +108,18 @@ module Chess
 		end
 
 		def check(king)
-			king.check_moves.any? do |move| 
+			king.check_moves.select do |move| 
 				if is_enemy?(king.position,move)
 					if is_valid_move?(move,king.position)
 						direction_check(move,king.position)
 					end					
 				end
 			end
+		end
+
+		def king_trapped?(king)
+			open_moves = king.valid_moves.select { |move| check_move(king.position,move) && is_unoccupied?(move) }
+			open_moves.empty?
 		end
 
 		def set_square(coordinate,piece)
@@ -130,16 +137,12 @@ module Chess
 
 		def is_valid_move?(move_from,move_to)
 			piece = get_piece(move_from)
+			p piece
 			if piece.piece_name == "Pawn"
 				pawn_diagonal_check(move_from,move_to) 
 			else
 				piece.valid_moves.include?(move_to)
 			end
-		end
-
-		def is_knight?(coordinate)
-			piece = get_piece(coordinate)
-			return piece.piece_name == "Knight"
 		end
 
 		def is_knight?(coordinate)
@@ -164,41 +167,43 @@ module Chess
 			end
 		end
 
-		def horizontal_path(row_from,col_from,col_to)
-			unhindered = true
+		def horizontal_path(row_from,col_from,row_to,col_to)
+			path = [[row_from,col_from]]
 			until col_from == col_to
 					col_from > col_to ? col_from -= 1 : col_from += 1
+					path << [row_from,col_from]
 					if is_unoccupied?([row_from,col_from]) == false && col_from != col_to
 						unhindered = false
 						break
 					end
 				end
-			return unhindered
+			return path
 		end
 
-		def vertical_path(row_from,col_from,row_to)
-			unhindered = true
+		def vertical_path(row_from,col_from,row_to,col_to)
+			path = [[row_from,col_from]]
 			until row_from == row_to
 					row_from > row_to ? row_from -= 1 : row_from += 1
+					path << [row_from,col_from]
 					if is_unoccupied?([row_from,col_from]) == false && row_from != row_to
 						unhindered = false
 						break
 					end
 				end
-			return unhindered
+			return path
 		end
 
 		def diagonal_path(row_from,col_from,row_to,col_to)
-			unhindered = true
+			path = [[row_from,col_from]]
 			until (row_from == row_to) && (col_from == col_to)
 				row_from > row_to ? row_from -= 1 : row_from += 1
 				col_from > col_to ? col_from -= 1 : col_from += 1
+				path << [row_from,col_from]
 				if is_unoccupied?([row_from,col_from]) == false && col_from != col_to && row_from != row_to
-					unhindered = false
 					break
 				end
 			end
-			return unhindered
+			return path
 		end
 
 		def direction_check(move_from, move_to)
@@ -206,17 +211,26 @@ module Chess
 			col_from = move_from[1]
 			row_to = move_to[0]
 			col_to = move_to[1]
-			return true if is_knight?(move_from)
-			return diagonal_path(row_from,col_from,row_to,col_to) if (row_from != row_to && col_from != col_to)
-			return vertical_path(row_from,col_from,row_to) if row_from != row_to 
-			return horizontal_path(row_from,col_from,row_to) if col_from != col_to
-			raise "Movement Error"
+			path = []
+			if is_knight?(move_from)
+				path = [[row_from,col_from],[row_to,col_to]] 
+			elsif is_pawn?(move_from)
+				path = [[row_from,col_from],[row_to,col_to]]
+			elsif (row_from != row_to && col_from != col_to)
+				path = diagonal_path(row_from,col_from,row_to,col_to)
+			elsif row_from != row_to
+				path = vertical_path(row_from,col_from,row_to,col_to)
+			elsif col_from != col_to
+				path = horizontal_path(row_from,col_from,row_to,col_to)
+			else
+				puts "Movement Error"
+			end
 		end
 
 		def check_move(move_from, move_to)
 			return "Invalid move" if is_valid_move?(move_from,move_to) == false
 			return "Target destination is an ally" if (is_unoccupied?(move_to) == false && is_enemy?(move_from,move_to) == false)
-			return "Move is blocked by another piece" if (direction_check(move_from,move_to) == false)
+			return "Move is blocked by another piece" if (direction_check(move_from,move_to).last != move_to)
 			true
 		end
 
