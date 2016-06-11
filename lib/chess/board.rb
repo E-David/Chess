@@ -1,10 +1,8 @@
 module Chess
 	class Board
-		attr_accessor :check_pieces
 		attr_reader :grid
 		def initialize(input = {})
 			@grid = input.fetch(:grid, default_board)
-			@check_pieces = check_pieces
 			setup_board
 		end
 
@@ -107,14 +105,17 @@ module Chess
 			all_pieces.select { |piece| piece.piece_name == "King" && piece.color == color }
 		end
 
-		def check(king)
-			king.check_moves.select do |move| 
-				if is_enemy?(king.position,move)
-					if is_valid_move?(move,king.position)
-						direction_check(move,king.position)
-					end					
-				end
+		def get_check_pieces(king)
+			king = get_piece(king)
+			checking_pieces = all_pieces.select do |piece| 
+				piece.color != king.color && piece.valid_moves.include?(king.position)
 			end
+		end
+
+		def check?(king)
+			check_pieces = get_check_pieces(king)
+			king = get_piece(king)
+			check_pieces.any? { |piece| check_move(piece.position,king.position) == true }
 		end
 
 		def king_trapped?(king)
@@ -137,7 +138,6 @@ module Chess
 
 		def is_valid_move?(move_from,move_to)
 			piece = get_piece(move_from)
-			p piece
 			if piece.piece_name == "Pawn"
 				pawn_diagonal_check(move_from,move_to) 
 			else
@@ -212,9 +212,7 @@ module Chess
 			row_to = move_to[0]
 			col_to = move_to[1]
 			path = []
-			if is_knight?(move_from)
-				path = [[row_from,col_from],[row_to,col_to]] 
-			elsif is_pawn?(move_from)
+			if is_knight?(move_from) || is_pawn?(move_from)
 				path = [[row_from,col_from],[row_to,col_to]]
 			elsif (row_from != row_to && col_from != col_to)
 				path = diagonal_path(row_from,col_from,row_to,col_to)
@@ -229,7 +227,7 @@ module Chess
 
 		def check_move(move_from, move_to)
 			return "Invalid move" if is_valid_move?(move_from,move_to) == false
-			return "Target destination is an ally" if (is_unoccupied?(move_to) == false && is_enemy?(move_from,move_to) == false)
+			return "Target destination is an ally" if (is_enemy?(move_from,move_to) == false)
 			return "Move is blocked by another piece" if (direction_check(move_from,move_to).last != move_to)
 			true
 		end

@@ -11,6 +11,5 @@ end
 
 x = Chess::Board.new
 x.set_square([3,4], Chess::King.new("white",[3,4]))
-x.set_square([2,4], Chess::Pawn.new("black",[2,4]))
-king = x.get_king("white")[0]
-puts x.check_move([2,4],[3,4])
+x.set_square([2,3], Chess::Pawn.new("black",[2,3]))
+p x.check?([3,4])

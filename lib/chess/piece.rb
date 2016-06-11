@@ -159,12 +159,11 @@ module Chess
 		end
 		
 		class King < Piece
-			attr_reader :valid_moves, :position, :unicode_char, :check_moves
+			attr_reader :valid_moves, :position, :unicode_char
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265A" : "\u2654"
 				@valid_moves = validate_move(available_moves)
-				@check_moves = possible_check_moves
 			end
 
 			def possible_moves
@@ -178,15 +177,6 @@ module Chess
 
 			def validate_move(moves)
 				moves.select { |move| move.all? { |x| x >= 0 && x <= 7 } }
-			end
-
-			def possible_check_moves
-				horiz = horizontal_moves
-				vertic = vertical_moves
-				diag = diagonal_moves
-				knight = knight_moves
-				possible_check_moves = horiz + vertic + diag + knight
-				return validate_move(possible_check_moves)
 			end
 		end
 end
