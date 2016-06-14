@@ -101,21 +101,56 @@ module Chess
 			all_pieces
 		end
 
+		def ally_pieces(color)
+			ally_pieces = all_pieces.select { |piece| piece.color == color }
+			ally_pieces
+		end
+
+		def enemy_pieces(color)
+			enemy_pieces = all_pieces.select { |piece| piece.color != color }
+			enemy_pieces
+		end
+
 		def get_king(color)
-			all_pieces.select { |piece| piece.piece_name == "King" && piece.color == color }
+			all_pieces.each { |piece| return piece if piece.piece_name == "King" && piece.color == color }
 		end
 
-		def get_check_pieces(king)
-			king = get_piece(king)
-			checking_pieces = all_pieces.select do |piece| 
-				piece.color != king.color && piece.valid_moves.include?(king.position)
+		def get_all_check_pieces(color)
+			king = get_king(color)
+			enemy_pieces(color).each { |piece| piece.valid_moves.include?(king.position) }
+		end
+
+		def get_valid_check_pieces(color)
+			all_check_pieces = get_all_check_pieces(color)
+			king = get_king(color)
+			all_check_pieces.select { |piece| check_move(piece.position,king.position) == true }
+		end
+
+		def get_check_paths(color)
+			valid_check_pieces = get_valid_check_pieces(color)
+			king = get_king(color)
+			check_paths = []
+			valid_check_pieces.each do |piece|
+				direction_check(piece.position,king.position)
 			end
+			check_paths
 		end
 
-		def check?(king)
-			check_pieces = get_check_pieces(king)
-			king = get_piece(king)
-			check_pieces.any? { |piece| check_move(piece.position,king.position) == true }
+		def check?(color)
+			get_check_paths(color).count >= 1
+		end
+
+		def can_block_check?(color)
+			check_paths = get_check_paths(color)
+			ally_pieces = ally_pieces(color)
+			ally_pieces.each do |piece|
+				check_paths.each do |path|
+					if piece.valid_moves.include?(path)
+						puts piece
+					end
+				end
+			end			
+			p check_paths
 		end
 
 		def king_trapped?(king)
@@ -132,103 +167,110 @@ module Chess
 		end
 
 		def is_enemy?(move_from,move_to)
-			return false if is_unoccupied?(move_to)
 			get_piece(move_from).color != get_piece(move_to).color
 		end
 
 		def is_valid_move?(move_from,move_to)
 			piece = get_piece(move_from)
-			if piece.piece_name == "Pawn"
-				pawn_diagonal_check(move_from,move_to) 
-			else
-				piece.valid_moves.include?(move_to)
-			end
+			piece.valid_moves.include?(move_to)
 		end
 
 		def is_knight?(coordinate)
 			piece = get_piece(coordinate)
-			return piece.piece_name == "Knight"
+			piece.piece_name == "Knight"
 		end
 
 		def is_pawn?(coordinate)
 			piece = get_piece(coordinate)
-			return piece.piece_name == "Pawn"
+			piece.piece_name == "Pawn"
 		end
 
-		# 1. check if movement is in a different row ([0]) and column ([1]), supplied by is_valid_move? method
+		# 1. check if movement is in a different row ([0]) and column ([1])
 		# 2. If not, pawn is going forward, check that move is valid and unhindered
 		def pawn_diagonal_check(move_from,move_to)
-			pawn = get_piece(move_from)
-			return false if pawn.valid_moves.include?(move_to) == false
 			if (move_from[0] != move_to[0] && move_from[1] != move_to[1])
 				is_enemy?(move_from,move_to)
-			else
-				is_unoccupied?(move_to)
 			end
 		end
 
-		def horizontal_path(row_from,col_from,row_to,col_to)
-			path = [[row_from,col_from]]
-			until col_from == col_to
-					col_from > col_to ? col_from -= 1 : col_from += 1
-					path << [row_from,col_from]
-					if is_unoccupied?([row_from,col_from]) == false && col_from != col_to
-						unhindered = false
+		def horizontal_path(move_from, move_to)
+			path = []
+			until move_from[1] == move_to[1]
+					move_from[1] > move_to[1] ? move_from[1] -= 1 : move_from[1] += 1
+					path << [move_from]
+					if is_unoccupied?([move_from]) == false
 						break
 					end
 				end
-			return path
+			path
 		end
 
-		def vertical_path(row_from,col_from,row_to,col_to)
-			path = [[row_from,col_from]]
-			until row_from == row_to
-					row_from > row_to ? row_from -= 1 : row_from += 1
-					path << [row_from,col_from]
-					if is_unoccupied?([row_from,col_from]) == false && row_from != row_to
-						unhindered = false
+		def vertical_path(move_from, move_to)
+			path = []
+			until move_from[0] == move_to[0]
+					move_from[0] > move_to[0] ? move_from[0] -= 1 : move_from[0] += 1
+					path << [move_from]
+					if is_unoccupied?([move_from]) == false
 						break
 					end
 				end
-			return path
+			path
 		end
 
-		def diagonal_path(row_from,col_from,row_to,col_to)
-			path = [[row_from,col_from]]
-			until (row_from == row_to) && (col_from == col_to)
-				row_from > row_to ? row_from -= 1 : row_from += 1
-				col_from > col_to ? col_from -= 1 : col_from += 1
-				path << [row_from,col_from]
-				if is_unoccupied?([row_from,col_from]) == false && col_from != col_to && row_from != row_to
+		def diagonal_path(move_from, move_to)
+			path = []
+			until (move_from[0] == move_to[0]) && (move_from[1] == move_to[1])
+				move_from[0] > move_to[0] ? move_from[0] -= 1 : move_from[0] += 1
+				move_from[1] > move_to[1] ? move_from[1] -= 1 : move_from[1] += 1
+				path << [move_from]
+				if is_unoccupied?([move_from]) == false
 					break
 				end
 			end
-			return path
+			path
 		end
 
 		def direction_check(move_from, move_to)
-			row_from = move_from[0]
-			col_from = move_from[1]
-			row_to = move_to[0]
-			col_to = move_to[1]
-			path = []
-			if is_knight?(move_from) || is_pawn?(move_from)
-				path = [[row_from,col_from],[row_to,col_to]]
-			elsif (row_from != row_to && col_from != col_to)
-				path = diagonal_path(row_from,col_from,row_to,col_to)
-			elsif row_from != row_to
-				path = vertical_path(row_from,col_from,row_to,col_to)
-			elsif col_from != col_to
-				path = horizontal_path(row_from,col_from,row_to,col_to)
+			direction = ""
+			if is_knight?(move_from) 
+				direction = "knight"
+			elsif (move_from[0] != move_to[0] && move_from[1] != move_to[1])
+				direction = "diagonal"
+			elsif move_from[0] != move_to[0]
+				direction = "vertical"
+			elsif move_from[1] != move_to[1]
+				direction = "horizontal"
 			else
 				puts "Movement Error"
 			end
+			direction
+		end
+
+		def move_unhindered?(move_from,move_to,direction)
+			final_move = []
+			case direction
+			when "knight"
+				final_move = move_to
+			when "pawn"
+				final_move = move_to if pawn_diagonal_check(move_from,move_to)
+			when "horizontal"
+				final_move = horizontal_path(move_from,move_to).last
+			when "vertical"
+				final_move = vertical_path(move_from,move_to).last
+			when "diagonal"
+				final_move = diagonal_path(move_from,move_to).last
+			else
+				puts "Movement Error"
+			end
+			final_move == move_to
 		end
 
 		def check_move(move_from, move_to)
+			return true if is_unoccupied?(move_to)
+			direction = direction_check(move_from, move_to)
 			return "Invalid move" if is_valid_move?(move_from,move_to) == false
 			return "Target destination is an ally" if (is_enemy?(move_from,move_to) == false)
-			return "Move is blocked by another piece" if (direction_check(move_from,move_to).last != move_to)
+			return "Move is blocked by another piece" if (move_unhindered?(move_from,move_to,direction) == false)
 			true
 		end
 
