@@ -130,27 +130,20 @@ module Chess
 			valid_check_pieces = get_valid_check_pieces(color)
 			king = get_king(color)
 			check_paths = []
-			valid_check_pieces.each do |piece|
-				direction_check(piece.position,king.position)
-			end
-			check_paths
+			valid_check_pieces.each { |piece| check_paths << get_path(piece.position,king.position) }
+			check_paths.each { |path| path.delete_if { |x| x == king.position } }
 		end
 
 		def check?(color)
 			get_check_paths(color).count >= 1
 		end
 
-		def can_block_check?(color)
-			check_paths = get_check_paths(color)
+		def block_check_path(color,path)
 			ally_pieces = ally_pieces(color)
-			ally_pieces.each do |piece|
-				check_paths.each do |path|
-					if piece.valid_moves.include?(path)
-						puts piece
-					end
-				end
-			end			
-			p check_paths
+			p path
+			ally_pieces.select do |piece|
+				p piece if !(piece.valid_moves & path).nil?
+			end
 		end
 
 		def king_trapped?(king)
@@ -186,32 +179,38 @@ module Chess
 			piece.piece_name == "Pawn"
 		end
 
-		# 1. check if movement is in a different row ([0]) and column ([1])
-		# 2. If not, pawn is going forward, check that move is valid and unhindered
-		def pawn_diagonal_check(move_from,move_to)
+		# check if piece is moving diagonally. If yes, returns if destination is occupied and an enemy
+		def pawn_path(move_from,move_to)
+			path = [move_from]
 			if (move_from[0] != move_to[0] && move_from[1] != move_to[1])
-				is_ally?(move_from,move_to) == false
+				if is_unoccupied?(move_to) == false && is_ally?(move_from,move_to) == false
+					path << [move_to]
+				end
+			else 
+				path = horizontal_path(move_from,move_to)
 			end
 		end
 
 		def horizontal_path(move_from, move_to)
-			path = []
-			until move_from[1] == move_to[1]
-					move_from[1] > move_to[1] ? move_from[1] -= 1 : move_from[1] += 1
-					path << move_from
-					if is_unoccupied?(move_from) == false
-						break
-					end
+			path = [move_from]
+			column = move_from[1]
+			until column == move_to[1]
+				column > move_to[1] ? column -= 1 : column += 1
+				path << [move_from[0],column]
+				if is_unoccupied?([move_from[0],column]) == false
+					break
 				end
+			end
 			path
 		end
 
 		def vertical_path(move_from, move_to)
-			path = []
-			until move_from[0] == move_to[0]
-					move_from[0] > move_to[0] ? move_from[0] -= 1 : move_from[0] += 1
-					path << move_from
-					if is_unoccupied?(move_from) == false
+			path = [move_from]
+			row = move_from[0]
+			until row == move_to[0]
+					row > move_to[0] ? row -= 1 : row += 1
+					path << [row,move_from[1]]
+					if is_unoccupied?([row,move_from[1]]) == false
 						break
 					end
 				end
@@ -219,12 +218,14 @@ module Chess
 		end
 
 		def diagonal_path(move_from, move_to)
-			path = []
-			until (move_from[0] == move_to[0]) && (move_from[1] == move_to[1])
-				move_from[0] > move_to[0] ? move_from[0] -= 1 : move_from[0] += 1
-				move_from[1] > move_to[1] ? move_from[1] -= 1 : move_from[1] += 1
-				path << move_from
-				if is_unoccupied?(move_from) == false
+			path = [move_from]
+			row = move_from[0]
+			column = move_from[1]
+			until (row == move_to[0]) && (column == move_to[1])
+				row > move_to[0] ? row -= 1 : row += 1
+				column > move_to[1] ? column -= 1 : column += 1
+				path << [row,column]
+				if is_unoccupied?([row,column]) == false
 					break
 				end
 			end
@@ -235,8 +236,8 @@ module Chess
 			path = []
 			if is_knight?(move_from) 
 				path = move_to
-			elsif is_pawn?(move_from) && pawn_diagonal_check(move_from,move_to)
-				path = move_to
+			elsif is_pawn?(move_from)
+				path = pawn_path(move_from,move_to)
 			elsif (move_from[0] != move_to[0] && move_from[1] != move_to[1]) && !is_pawn?(move_from)
 				path = diagonal_path(move_from,move_to)
 			elsif move_from[1] != move_to[1]
