@@ -126,33 +126,78 @@ module Chess
 			all_check_pieces.select { |piece| check_move(piece.position,king.position) == true }
 		end
 
+		def get_check_piece_positions(color)
+			check_piece_positions = []
+			get_valid_check_pieces(color).each { |piece| check_piece_positions << piece.position }
+			check_piece_positions
+		end
+
 		def get_check_paths(color)
-			valid_check_pieces = get_valid_check_pieces(color)
 			king = get_king(color)
 			check_paths = []
-			valid_check_pieces.each { |piece| check_paths << get_path(piece.position,king.position) }
+			get_valid_check_pieces(color).each { |piece| check_paths << get_path(piece.position,king.position) }
 			check_paths.each { |path| path.delete_if { |x| x == king.position } }
 		end
 
 		def check?(color)
 			get_check_paths(color).count >= 1
 		end
-
+			#Uses the & method to find common elements (an intersection) between given path and ally piece valid moves
+			#then checks if the ally piece can move to this intersection. 
+			#Finally, returns all pieces that can block the check path
 		def block_check_path(color,path)
 			ally_pieces = ally_pieces(color)
-			p path
-			ally_pieces.select do |piece|
-				p piece if !(piece.valid_moves & path).nil?
+			blocking_pieces = []
+			ally_pieces.each do |piece|
+				intersections = piece.valid_moves & path
+				if intersections.size >= 1
+					intersections.each { |this| blocking_pieces << piece if check_move(piece.position,this) }
+				end
 			end
+			blocking_pieces
 		end
 
-		def king_trapped?(king)
-			open_moves = king.valid_moves.select { |move| check_move(king.position,move) && is_unoccupied?(move) }
-			open_moves.empty?
+		def all_check_paths_blocked?(color)
+			get_check_paths(color).each { |path| }
+
 		end
 
-		def set_square(coordinate,piece)
+		def possible_king_moves(king)
+			king.valid_moves.select { |move| check_move(king.position,move) && is_unoccupied?(move) }
+		end
+
+		def king_trapped?(color)
+			king = get_king(color)
+			original_position = king.position
+			still_check = ""
+			possible_king_moves(king).any? do |king_move|
+				move_piece(king.position,king_move)
+				still_check = check?(color)
+				move_piece(king.position,original_position)
+				still_check
+			end
+			p king
+		end
+
+		def eliminate_check_piece(color)
+			piece = []
+			get_check_piece_positions(color).each do |check_piece_position|
+				ally_pieces(color).each do |ally_piece|
+					piece << ally_piece.position if check_move(ally_piece.position,check_piece_position) == true
+				end
+			end
+			piece
+		end
+
+		def set_square(coordinate,piece="")
 			get_square(coordinate).value = piece
+			piece.position = coordinate if piece != ""
+		end
+
+		def move_piece(coordinate_from,coordinate_to)
+			piece = get_piece(coordinate_from)
+			set_square(coordinate_to,piece)
+			set_square(coordinate_from)
 		end
 
 		def is_unoccupied?(coordinate)

@@ -11,8 +11,7 @@ end
 
 x = Chess::Board.new
 x.set_square([3,4], Chess::King.new("white",[3,4]))
-x.set_square([2,3], Chess::King.new("black",[2,3]))
 x.set_square([3,0], Chess::Queen.new("black",[3,0]))
-x.set_square([3,0], Chess::Queen.new("white",[5,3]))
-path = x.get_path([3,0],[3,4])
-x.block_check_path("white",path)
+x.set_square([4,0], Chess::Queen.new("white",[4,0]))
+king = x.get_piece([3,4])
+x.king_trapped?("white")

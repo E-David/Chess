@@ -1,6 +1,7 @@
 module Chess
 	class Piece
-		attr_reader :color, :position, :piece_name
+		attr_reader :color, :piece_name
+		attr_accessor :position
 		def initialize(color, position=[])
 			@color = color
 			@position = position
@@ -57,7 +58,8 @@ module Chess
 	end
 
 		class Pawn < Piece
-			attr_reader :valid_moves, :position, :unicode_char
+			attr_reader :valid_moves, :unicode_char
+			attr_accessor :position
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265F" : "\u2659"
@@ -90,7 +92,8 @@ module Chess
 		end
 
 		class Rook < Piece
-			attr_reader :valid_moves, :position, :unicode_char
+			attr_reader :valid_moves, :unicode_char
+			attr_accessor :position
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265C" : "\u2656"
@@ -106,7 +109,8 @@ module Chess
 		end
 
 		class Knight < Piece
-			attr_reader :valid_moves, :position, :unicode_char
+			attr_reader :valid_moves, :unicode_char
+			attr_accessor :position
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265E" : "\u2658"
@@ -128,7 +132,8 @@ module Chess
 		end
 		
 		class Bishop < Piece
-			attr_reader :valid_moves, :position, :unicode_char
+			attr_reader :valid_moves, :unicode_char
+			attr_accessor :position
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265D" : "\u2657"
@@ -142,7 +147,8 @@ module Chess
 		end
 
 		class Queen < Piece
-			attr_reader :valid_moves, :position, :unicode_char
+			attr_reader :valid_moves, :unicode_char
+			attr_accessor :position
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265B" : "\u2655"
@@ -159,7 +165,8 @@ module Chess
 		end
 		
 		class King < Piece
-			attr_reader :valid_moves, :position, :unicode_char
+			attr_reader :valid_moves, :unicode_char
+			attr_accessor :position
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265A" : "\u2654"
