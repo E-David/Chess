@@ -196,9 +196,9 @@ module Chess
 		end
 
 		def checkmate?(color)
-			return "Can eliminate check piece" if eliminate_check_piece(color) == true
+			return "Can eliminate check piece" if eliminate_check_piece(color)
 			return "King can move out of check" if king_trapped(color) == false
-			return "Can block check path" if block_check_path(color) == true
+			return "Can block check path" if block_check_path(color)
 			true
 		end
 
