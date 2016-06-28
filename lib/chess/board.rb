@@ -321,10 +321,27 @@ module Chess
 			true
 		end
 
+		def valid_moves_exist?(color)
+			ally_pieces(color).any? do |piece|
+				piece.valid_moves.any? do |move|
+					check_move(piece.position,move) == true
+				end
+			end
+		end
+
 		def game_over
 			return :winner if winner?
 			return :draw if draw?
 			false
+		end
+
+		def winner?(color)
+			checkmate?(color)
+		end
+
+		def draw?
+			check?(color) == false
+			valid_moves_exist?(color) == false
 		end
 
 		private
