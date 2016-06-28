@@ -102,7 +102,7 @@ module Chess
 		end
 
 		def ally_pieces(color)
-			ally_pieces = all_pieces.select { |piece| piece.color == color }
+			ally_pieces = all_pieces.select { |piece| piece.color == color && piece.piece_name != "King" }
 			ally_pieces
 		end
 
@@ -145,48 +145,61 @@ module Chess
 			#Uses the & method to find common elements (an intersection) between given path and ally piece valid moves
 			#then checks if the ally piece can move to this intersection. 
 			#Finally, returns all pieces that can block the check path
-		def block_check_path(color,path)
-			ally_pieces = ally_pieces(color)
-			blocking_pieces = []
-			ally_pieces.each do |piece|
-				intersections = piece.valid_moves & path
-				if intersections.size >= 1
-					intersections.each { |this| blocking_pieces << piece if check_move(piece.position,this) }
+		def block_check_path(color)
+			can_block = ""
+			get_check_paths(color).each do |path|
+				ally_pieces(color).each do |piece|
+					intersections = piece.valid_moves & path
+					if intersections.size >= 1
+						intersections.each do |intersection| 
+							if check_move(piece.position,intersection) == true
+								can_block = true if still_in_check?(piece.position,intersection,color) == false
+							end
+						end
+					end
 				end
 			end
-			blocking_pieces
-		end
-
-		def all_check_paths_blocked?(color)
-			get_check_paths(color).each { |path| }
-
+			can_block
 		end
 
 		def possible_king_moves(king)
 			king.valid_moves.select { |move| check_move(king.position,move) && is_unoccupied?(move) }
 		end
 
-		def king_trapped?(color)
+		def king_trapped(color)
 			king = get_king(color)
 			original_position = king.position
-			still_check = ""
-			possible_king_moves(king).any? do |king_move|
-				move_piece(king.position,king_move)
-				still_check = check?(color)
-				move_piece(king.position,original_position)
-				still_check
+			possible_king_moves(king).all? do |king_move|
+				still_in_check?(king.position,king_move,color) == true
 			end
-			p king
 		end
 
 		def eliminate_check_piece(color)
-			piece = []
-			get_check_piece_positions(color).each do |check_piece_position|
-				ally_pieces(color).each do |ally_piece|
-					piece << ally_piece.position if check_move(ally_piece.position,check_piece_position) == true
+			get_check_piece_positions(color).any? do |check_piece_position|
+				ally_pieces(color).any? do |ally_piece|
+					if check_move(ally_piece.position,check_piece_position) == true
+						still_in_check?(ally_piece.position,check_piece_position,color) == false
+					end
 				end
 			end
-			piece
+		end
+
+		def still_in_check?(move_from,move_to,color)
+			check = ""
+			original_from_piece = get_piece(move_from)
+			original_to_piece = get_piece(move_to)
+			move_piece(move_from,move_to)
+			check = check?(color)
+			set_square(move_from,original_from_piece)
+			set_square(move_to,original_to_piece)
+			check
+		end
+
+		def checkmate?(color)
+			return "Can eliminate check piece" if eliminate_check_piece(color) == true
+			return "King can move out of check" if king_trapped(color) == false
+			return "Can block check path" if block_check_path(color) == true
+			true
 		end
 
 		def set_square(coordinate,piece="")
@@ -229,11 +242,12 @@ module Chess
 			path = [move_from]
 			if (move_from[0] != move_to[0] && move_from[1] != move_to[1])
 				if is_unoccupied?(move_to) == false && is_ally?(move_from,move_to) == false
-					path << [move_to]
+					path << move_to
 				end
 			else 
 				path = horizontal_path(move_from,move_to)
 			end
+			path
 		end
 
 		def horizontal_path(move_from, move_to)
