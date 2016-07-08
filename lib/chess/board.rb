@@ -209,7 +209,8 @@ module Chess
 
 		def move_piece(coordinate_from,coordinate_to)
 			piece = get_piece(coordinate_from)
-			set_square(coordinate_to,piece)
+			piece_class = Chess.const_get(piece.piece_name)
+			set_square(coordinate_to, piece_class.new(piece.color,coordinate_to))
 			set_square(coordinate_from)
 		end
 
@@ -245,7 +246,7 @@ module Chess
 					path << move_to
 				end
 			else 
-				path = horizontal_path(move_from,move_to)
+				path = vertical_path(move_from,move_to)
 			end
 			path
 		end
@@ -329,9 +330,9 @@ module Chess
 			end
 		end
 
-		def game_over
-			return :winner if winner?
-			return :draw if draw?
+		def game_over(color)
+			return :winner if winner?(color)
+			return :draw if draw?(color)
 			false
 		end
 
