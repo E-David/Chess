@@ -9,4 +9,5 @@ module Chess
 	require_relative "./chess/core_extensions.rb"
 end
 
-Chess::Game.new
+x = Chess::Board.new
+x.display_board

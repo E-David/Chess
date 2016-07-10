@@ -27,31 +27,31 @@ module Chess
 		end
 
 		def setup_pawns
-			(0..7).each do |col| 
-				set_square([1,col], Pawn.new("black",[1,col]))
-				set_square([6,col], Pawn.new("white",[6,col]))
+			(1..8).each do |col| 
+				set_square([2,col], Pawn.new("black",[2,col]))
+				set_square([7,col], Pawn.new("white",[7,col]))
 			end
 		end
 
 		def setup_back_rows
-			(0..7).each do |col| 
+			(1..8).each do |col| 
 				case col 
-				when 0 
-					set_square([0,col], Rook.new("black",[0,col])) ; set_square([7,col], Rook.new("white",[7,col]))
-				when 1
-					set_square([0,col], Knight.new("black",[0,col])) ; set_square([7,col], Knight.new("white",[7,col]))
+				when 1 
+					set_square([1,col], Rook.new("black",[1,col])) ; set_square([8,col], Rook.new("white",[8,col]))
 				when 2
-					set_square([0,col], Bishop.new("black",[0,col])) ; set_square([7,col], Bishop.new("white",[7,col]))
+					set_square([1,col], Knight.new("black",[1,col])) ; set_square([8,col], Knight.new("white",[8,col]))
 				when 3
-					set_square([0,col], Queen.new("black",[0,col])) ; set_square([7,col], Queen.new("white",[7,col]))
+					set_square([1,col], Bishop.new("black",[1,col])) ; set_square([8,col], Bishop.new("white",[8,col]))
 				when 4
-					set_square([0,col], King.new("black",[0,col])) ; set_square([7,col], King.new("white",[7,col]))
+					set_square([1,col], Queen.new("black",[1,col])) ; set_square([8,col], Queen.new("white",[8,col]))
 				when 5
-					set_square([0,col], Bishop.new("black",[0,col])) ; set_square([7,col], Bishop.new("white",[7,col]))
+					set_square([1,col], King.new("black",[1,col])) ; set_square([8,col], King.new("white",[8,col]))
 				when 6
-					set_square([0,col], Knight.new("black",[0,col])) ; set_square([7,col], Knight.new("white",[7,col]))
+					set_square([1,col], Bishop.new("black",[1,col])) ; set_square([8,col], Bishop.new("white",[8,col]))
 				when 7
-					set_square([0,col], Rook.new("black",[0,col])) ; set_square([7,col], Rook.new("white",[7,col]))
+					set_square([1,col], Knight.new("black",[1,col])) ; set_square([8,col], Knight.new("white",[8,col]))
+				when 8
+					set_square([1,col], Rook.new("black",[1,col])) ; set_square([8,col], Rook.new("white",[8,col]))
 				end
 			end
 		end
@@ -68,7 +68,11 @@ module Chess
 			grid.each_with_index do |row, row_index| 
 				row.each_with_index do |square, col_index|
 					if row_index.even?
-						col_index.even? ? square.color = "black" : square.color = "white"
+						if row_index == 0
+							square.color = ("a".."z").to_a[col_index - 1]
+						else
+							col_index.even? ? square.color = "black" : square.color = "white"
+						end
 					else
 						col_index.even? ? square.color = "white" : square.color = "black"
 					end
@@ -80,8 +84,8 @@ module Chess
 			grid.each do |row|
 				display = ""
 				row.each do |square|
-					piece_display = square.value == "" ? "  " : square.value.unicode_char
-					display += square.color == "black" ? "I #{piece_display} I" : "| #{piece_display} |"
+					piece_display = square.value.class.name == "String" ? square.color : square.value.unicode_char
+					display += square.color == "black" ? " #{piece_display} " : " #{piece_display} "
 				end
 				puts display
 			end
@@ -348,7 +352,7 @@ module Chess
 		private
 
 		def default_board
-			Array.new(8) { Array.new(8) { Square.new } }
+			Array.new(9) { Array.new(9) { Square.new } }
 		end
 	end
 end

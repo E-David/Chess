@@ -15,7 +15,7 @@ module Chess
 			puts "Player 1, please type your name:"
 			player_1 = "Harry"
 			puts "Player 2, please type your name:"
-			player_2 = "Hurry"
+			player_2 = "Marge"
 			@players = [Chess::Player.new(player_1,""), Chess::Player.new(player_2,"")]
 		end
 
