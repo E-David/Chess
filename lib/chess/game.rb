@@ -26,7 +26,7 @@ module Chess
 		def get_row
 			p "#{current_player.name}, choose a row"
 			while row = gets.to_i
-				if row >= 0 && row <= 7
+				if row >= 1 && row <= 8
 					break
 				else
 					p "invalid input"
@@ -38,7 +38,7 @@ module Chess
 		def get_column
 			p "#{current_player.name}, choose a column"
 			while col = gets.to_i
-				if col >= 0 && col <= 7
+				if col >= 1 && col <= 8
 					break
 				else
 					p "invalid input"
@@ -67,7 +67,8 @@ module Chess
 				board.display_board
 				while move_from = get_coordinate
 					p "#{current_player.name}, choose a piece"
-					p board.get_piece(move_from)
+					p board.get_piece(move_from).to_s
+					p "Available Moves: #{board.possible_moves(move_from)}"
 					if validate_move_from(move_from)
 						break
 					else
@@ -77,7 +78,7 @@ module Chess
 
 				while move_to = get_coordinate
 					p "#{current_player.name}, choose a destination"
-					p board.get_piece(move_to)
+					p board.get_piece(move_to).to_s
 					if board.check_move(move_from,move_to) == true
 						board.move_piece(move_from,move_to)
 						break

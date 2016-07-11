@@ -16,14 +16,14 @@ module Chess
 		def horizontal_moves
 			move_list = []
 			row = position[0]
-			(0..7).each { |col| move_list << [row,col]}
+			(1..8).each { |col| move_list << [row,col]}
 			move_list
 		end
 
 		def vertical_moves
 			move_list = []
 			col = position[1]
-			(0..7).each { |row| move_list << [row,col]}
+			(1..8).each { |row| move_list << [row,col]}
 			move_list
 		end
 
@@ -33,7 +33,7 @@ module Chess
 			col = position[1]
 			[[-1,-1],[-1,1],[1,-1],[1,1]].each do |move|
 			new_move = apply_move_to_position(move,[row,col])
-				until new_move[0] > 7 || new_move[1] > 7 || new_move[0] < 0 || new_move[1] < 0
+				until new_move[0] > 8 || new_move[1] > 8 || new_move[0] < 1 || new_move[1] < 1
 					move_list << new_move if move_list.include?(new_move) == false
 					new_move = apply_move_to_position(move,new_move)
 				end
@@ -50,9 +50,9 @@ module Chess
 
 		def to_s
 			string = ""
-			string += "piece name: #{self.piece_name}"
-			string += ", piece color: #{self.color}"
-			#string += ", piece valid moves #{self.valid_moves}"
+			string += "Piece Name: #{self.piece_name}"
+			string += ", Color: #{self.color}"
+			#string += ", Available Moves: #{self.valid_moves}"
 			return string
 		end
 	end
@@ -79,7 +79,7 @@ module Chess
 			end
 
 			def first_move?
-				color == "black" && position[0] == 1 || color == "white" && position[0] == 6
+				color == "black" && position[0] == 2 || color == "white" && position[0] == 7
 			end
 
 			def available_moves
@@ -87,7 +87,7 @@ module Chess
 			end
 
 			def validate_move
-				valid_moves = available_moves.select { |move| move.all? { |x| x >= 0 && x <= 7 } }
+				valid_moves = available_moves.select { |move| move.all? { |x| x >= 1 && x <= 8 } }
 			end
 		end
 
@@ -127,7 +127,7 @@ module Chess
 			end
 
 			def validate_move
-				valid_moves = available_moves.select { |move| move.all? { |x| x >= 0 && x <= 7 } }
+				valid_moves = available_moves.select { |move| move.all? { |x| x >= 1 && x <= 8 } }
 			end
 		end
 		
@@ -183,7 +183,7 @@ module Chess
 			end
 
 			def validate_move(moves)
-				moves.select { |move| move.all? { |x| x >= 0 && x <= 7 } }
+				moves.select { |move| move.all? { |x| x >= 1 && x <= 8 } }
 			end
 		end
 end

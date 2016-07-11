@@ -22,6 +22,7 @@ module Chess
 		def setup_board
 			coordinate_board
 			colorize_board
+			label_board_axes
 			setup_pawns
 			setup_back_rows
 		end
@@ -68,13 +69,25 @@ module Chess
 			grid.each_with_index do |row, row_index| 
 				row.each_with_index do |square, col_index|
 					if row_index.even?
-						if row_index == 0
-							square.color = ("a".."z").to_a[col_index - 1]
-						else
-							col_index.even? ? square.color = "black" : square.color = "white"
-						end
+						col_index.even? ? square.color = "B" : square.color = "W"
 					else
-						col_index.even? ? square.color = "white" : square.color = "black"
+						col_index.even? ? square.color = "W" : square.color = "B"
+					end
+				end
+			end
+		end
+
+		def label_board_axes
+			grid.each_with_index do |row, row_index| 
+				row.each_with_index do |square, col_index|
+					if row_index == 0
+						col_index == 0 ? square.color = "_" : square.color = ("A".."Z").to_a[col_index - 1]
+					end
+
+					if col_index == 0
+						unless row_index == 0
+							square.color = (1..8).to_a[row_index - 1]
+						end
 					end
 				end
 			end
@@ -85,7 +98,7 @@ module Chess
 				display = ""
 				row.each do |square|
 					piece_display = square.value.class.name == "String" ? square.color : square.value.unicode_char
-					display += square.color == "black" ? " #{piece_display} " : " #{piece_display} "
+					display += square.value.class.name == "String" ? "  #{piece_display}  " : "  #{piece_display}  "
 				end
 				puts display
 			end
@@ -166,6 +179,11 @@ module Chess
 			can_block
 		end
 
+		def possible_moves(coord)
+			piece = get_piece(coord)
+			piece.valid_moves.select { |move| check_move(piece.position,move) }
+		end
+		
 		def possible_king_moves(king)
 			king.valid_moves.select { |move| check_move(king.position,move) && is_unoccupied?(move) }
 		end
