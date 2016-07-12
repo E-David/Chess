@@ -52,12 +52,13 @@ module Chess
 		end
 
 		def validate_move_from(coordinate)
+			return false if board.get_piece(coordinate) == ""
 			board.get_piece(coordinate).color == current_player.color
 		end
 
 		def game_over_message
-			return "#{current_player.name} wins!" if board.game_over == :winner
-			return "Stalemate!" if board.game_over == :draw 
+			return "#{current_player.name} wins!" if board.game_over(other_player.color) == :winner
+			return "Stalemate!" if board.game_over(other_player.color) == :draw 
 		end
 
 		def play_game
@@ -65,20 +66,22 @@ module Chess
 			puts ""
 			while true
 				board.display_board
+				p "#{current_player.name}, choose a piece to move"
 				while move_from = get_coordinate
-					p "#{current_player.name}, choose a piece"
 					p board.get_piece(move_from).to_s
-					p "Available Moves: #{board.possible_moves(move_from)}"
-					if validate_move_from(move_from)
-						break
-					else
+					if validate_move_from(move_from) == false
 						p "You did not select a piece of your color"
+					elsif board.show_legal_moves(move_from).empty?
+						p "No available moves for this piece"
+					else
+						p "Available Moves: #{board.show_legal_moves(move_from)}"
+						break
 					end
 				end
 
+				p "#{current_player.name}, choose a destination"
 				while move_to = get_coordinate
-					p "#{current_player.name}, choose a destination"
-					p board.get_piece(move_to).to_s
+					p board.get_piece(move_to).to_s if board.get_piece(move_to) != ""
 					if board.check_move(move_from,move_to) == true
 						board.move_piece(move_from,move_to)
 						break
@@ -87,9 +90,9 @@ module Chess
 					end
 				end
 
-				if board.game_over(current_player.color) == false
+				if board.game_over(other_player.color) != false
+					p game_over_message
 					board.display_board
-					p "END"
 					break
 				else
 					switch_player

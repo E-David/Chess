@@ -59,11 +59,12 @@ module Chess
 
 		class Pawn < Piece
 			attr_reader :valid_moves, :unicode_char
-			attr_accessor :position
+			attr_accessor :position, :legal_moves
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265F" : "\u2659"
 				@valid_moves = validate_move
+				@legal_moves = legal_moves
 			end
 
 			def possible_moves
@@ -93,11 +94,12 @@ module Chess
 
 		class Rook < Piece
 			attr_reader :valid_moves, :unicode_char
-			attr_accessor :position
+			attr_accessor :position, :legal_moves
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265C" : "\u2656"
 				@valid_moves = possible_moves
+				@legal_moves = legal_moves
 			end
 
 			def possible_moves
@@ -110,11 +112,12 @@ module Chess
 
 		class Knight < Piece
 			attr_reader :valid_moves, :unicode_char
-			attr_accessor :position
+			attr_accessor :position, :legal_moves
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265E" : "\u2658"
 				@valid_moves = validate_move
+				@legal_moves = legal_moves
 			end
 
 			def possible_moves
@@ -133,11 +136,12 @@ module Chess
 		
 		class Bishop < Piece
 			attr_reader :valid_moves, :unicode_char
-			attr_accessor :position
+			attr_accessor :position, :legal_moves
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265D" : "\u2657"
 				@valid_moves = possible_moves
+				@legal_moves = legal_moves
 			end
 
 			def possible_moves
@@ -148,11 +152,12 @@ module Chess
 
 		class Queen < Piece
 			attr_reader :valid_moves, :unicode_char
-			attr_accessor :position
+			attr_accessor :position, :legal_moves
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265B" : "\u2655"
 				@valid_moves = possible_moves
+				@legal_moves = legal_moves
 			end
 
 			def possible_moves
@@ -166,11 +171,12 @@ module Chess
 		
 		class King < Piece
 			attr_reader :valid_moves, :unicode_char
-			attr_accessor :position
+			attr_accessor :position, :legal_moves
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265A" : "\u2654"
 				@valid_moves = validate_move(available_moves)
+				@legal_moves = legal_moves
 			end
 
 			def possible_moves

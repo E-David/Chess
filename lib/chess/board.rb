@@ -81,7 +81,7 @@ module Chess
 			grid.each_with_index do |row, row_index| 
 				row.each_with_index do |square, col_index|
 					if row_index == 0
-						col_index == 0 ? square.color = "_" : square.color = ("A".."Z").to_a[col_index - 1]
+						col_index == 0 ? square.color = "_" : square.color = ("1".."8").to_a[col_index - 1]
 					end
 
 					if col_index == 0
@@ -229,6 +229,11 @@ module Chess
 			piece.position = coordinate if piece != ""
 		end
 
+		def show_legal_moves(coordinate)
+			piece = get_piece(coordinate)
+			piece.valid_moves.select { |move| check_move(piece.position,move) == true }
+		end
+
 		def move_piece(coordinate_from,coordinate_to)
 			piece = get_piece(coordinate_from)
 			piece_class = Chess.const_get(piece.piece_name)
@@ -268,7 +273,7 @@ module Chess
 					path << move_to
 				end
 			else 
-				path = vertical_path(move_from,move_to)
+				path << move_to if is_unoccupied?(move_to)
 			end
 			path
 		end
@@ -317,7 +322,7 @@ module Chess
 		def get_path(move_from,move_to)
 			path = []
 			if is_knight?(move_from) 
-				path = move_to
+				path = [move_to]
 			elsif is_pawn?(move_from)
 				path = pawn_path(move_from,move_to)
 			elsif (move_from[0] != move_to[0] && move_from[1] != move_to[1]) && !is_pawn?(move_from)
@@ -359,10 +364,12 @@ module Chess
 		end
 
 		def winner?(color)
-			checkmate?(color)
+			if check?(color)
+				checkmate?(color) ? true : (p "#{color} king is in check!")
+			end
 		end
 
-		def draw?
+		def draw?(color)
 			check?(color) == false
 			valid_moves_exist?(color) == false
 		end
