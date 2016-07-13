@@ -81,12 +81,12 @@ module Chess
 			grid.each_with_index do |row, row_index| 
 				row.each_with_index do |square, col_index|
 					if row_index == 0
-						col_index == 0 ? square.color = "_" : square.color = ("1".."8").to_a[col_index - 1]
+						col_index == 0 ? square.color = "_" : square.color = ("A".."H").to_a[col_index - 1]
 					end
 
 					if col_index == 0
 						unless row_index == 0
-							square.color = (1..8).to_a[row_index - 1]
+							square.color = (1..8).to_a.reverse[row_index - 1]
 						end
 					end
 				end
@@ -231,7 +231,8 @@ module Chess
 
 		def show_legal_moves(coordinate)
 			piece = get_piece(coordinate)
-			piece.valid_moves.select { |move| check_move(piece.position,move) == true }
+			legal_moves = piece.valid_moves.select { |move| check_move(piece.position,move) == true }
+			legal_moves.chessify_coordinates.join(",")
 		end
 
 		def move_piece(coordinate_from,coordinate_to)

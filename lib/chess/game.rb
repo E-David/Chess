@@ -23,22 +23,10 @@ module Chess
 			@current_player,@other_player = @other_player,@current_player
 		end
 
-		def get_row
-			p "#{current_player.name}, choose a row"
-			while row = gets.to_i
-				if row >= 1 && row <= 8
-					break
-				else
-					p "invalid input"
-				end
-			end
-			row
-		end
-
 		def get_column
-			p "#{current_player.name}, choose a column"
-			while col = gets.to_i
-				if col >= 1 && col <= 8
+			while col = gets.chomp
+				if col.match(/[A-H]|[a-h]/)
+					col = col.upcase.letter_to_number
 					break
 				else
 					p "invalid input"
@@ -47,8 +35,34 @@ module Chess
 			col
 		end
 
+		def get_row
+			while row = gets.to_i
+				if row >= 1 && row <= 8
+					row = row.reverse_number
+					break
+				else
+					p "invalid input"
+				end
+			end
+			row
+		end
+
 		def get_coordinate
-			[get_row,get_column]
+			while coord = gets.chomp.split("")
+				if coord.size != 2
+					p "Please type a letter + number"	
+				else
+					coord = coord.unchessify_coordinates				
+					if (coord[0].match(/[A-H]|[a-h]/)) == false
+						p "invalid column"
+					elsif (coord[1] >= 1 && coord[1] <= 8) == false
+						p "invalid row"
+					else
+						break
+					end
+				end
+			end
+			coord
 		end
 
 		def validate_move_from(coordinate)
