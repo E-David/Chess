@@ -8,8 +8,8 @@ module Chess
 
 		def to_s
 			string = ""
-			grid.each do |row| 
-				row.each do |square| 
+			grid.each do |col| 
+				col.each do |square| 
 					string += square.to_s
 					string += ", " if square.value != ""
 					string += square.value.to_s
@@ -27,51 +27,21 @@ module Chess
 			setup_back_rows
 		end
 
-		def setup_pawns
-			(1..8).each do |col| 
-				set_square([2,col], Pawn.new("black",[2,col]))
-				set_square([7,col], Pawn.new("white",[7,col]))
-			end
-		end
-
-		def setup_back_rows
-			(1..8).each do |col| 
-				case col 
-				when 1 
-					set_square([1,col], Rook.new("black",[1,col])) ; set_square([8,col], Rook.new("white",[8,col]))
-				when 2
-					set_square([1,col], Knight.new("black",[1,col])) ; set_square([8,col], Knight.new("white",[8,col]))
-				when 3
-					set_square([1,col], Bishop.new("black",[1,col])) ; set_square([8,col], Bishop.new("white",[8,col]))
-				when 4
-					set_square([1,col], Queen.new("black",[1,col])) ; set_square([8,col], Queen.new("white",[8,col]))
-				when 5
-					set_square([1,col], King.new("black",[1,col])) ; set_square([8,col], King.new("white",[8,col]))
-				when 6
-					set_square([1,col], Bishop.new("black",[1,col])) ; set_square([8,col], Bishop.new("white",[8,col]))
-				when 7
-					set_square([1,col], Knight.new("black",[1,col])) ; set_square([8,col], Knight.new("white",[8,col]))
-				when 8
-					set_square([1,col], Rook.new("black",[1,col])) ; set_square([8,col], Rook.new("white",[8,col]))
-				end
-			end
-		end
-
 		def coordinate_board
-			grid.each_with_index do |row,row_index| 
-				row.each_with_index do |square,column_index|
-					square.coordinate = [row_index,column_index]
+			grid.each_with_index do |col,col_index| 
+				col.each_with_index do |square,row_index|
+					square.coordinate = [col_index,row_index]
 				end
 			end
 		end
 
 		def colorize_board
-			grid.each_with_index do |row, row_index| 
-				row.each_with_index do |square, col_index|
-					if row_index.even?
-						col_index.even? ? square.color = "B" : square.color = "W"
+			grid.each_with_index do |col,col_index| 
+				col.each_with_index do |square,row_index|
+					if col_index.even?
+						row_index.even? ? square.color = "B" : square.color = "W"
 					else
-						col_index.even? ? square.color = "W" : square.color = "B"
+						row_index.even? ? square.color = "W" : square.color = "B"
 					end
 				end
 			end
@@ -92,6 +62,38 @@ module Chess
 				end
 			end
 		end
+
+		def setup_pawns
+			(1..8).each do |col| 
+				set_square([col,2], Pawn.new("black",([col,2])))
+				set_square([col,7], Pawn.new("white",([col,7])))
+			end
+		end
+
+		def setup_back_rows
+			(1..8).each do |col| 
+				case col 
+				when 1 
+					set_square([col,1],   Rook.new("black",[col,1])) ; set_square([col,8],   Rook.new("white",[col,8]))
+				when 2
+					set_square([col,1], Knight.new("black",[col,1])) ; set_square([col,8], Knight.new("white",[col,8]))
+				when 3
+					set_square([col,1], Bishop.new("black",[col,1])) ; set_square([col,8], Bishop.new("white",[col,8]))
+				when 4
+					set_square([col,1],  Queen.new("black",[col,1])) ; set_square([col,8],  Queen.new("white",[col,8]))
+				when 5
+					set_square([col,1],   King.new("black",[col,1])) ; set_square([col,8],   King.new("white",[col,8]))
+				when 6
+					set_square([col,1], Bishop.new("black",[col,1])) ; set_square([col,8], Bishop.new("white",[col,8]))
+				when 7
+					set_square([col,1], Knight.new("black",[col,1])) ; set_square([col,8], Knight.new("white",[col,8]))
+				when 8
+					set_square([col,1],   Rook.new("black",[col,1])) ; set_square([col,8],   Rook.new("white",[col,8]))
+				end
+			end
+		end
+
+
 
 		def display_board
 			grid.each do |row|
@@ -281,11 +283,11 @@ module Chess
 
 		def horizontal_path(move_from, move_to)
 			path = [move_from]
-			column = move_from[1]
-			until column == move_to[1]
-				column > move_to[1] ? column -= 1 : column += 1
-				path << [move_from[0],column]
-				if is_unoccupied?([move_from[0],column]) == false
+			column = move_from[0]
+			until column == move_to[0]
+				column > move_to[0] ? column -= 1 : column += 1
+				path << [column,move_from[1]]
+				if is_unoccupied?([column,move_from[1]]) == false
 					break
 				end
 			end
@@ -294,11 +296,11 @@ module Chess
 
 		def vertical_path(move_from, move_to)
 			path = [move_from]
-			row = move_from[0]
-			until row == move_to[0]
-					row > move_to[0] ? row -= 1 : row += 1
-					path << [row,move_from[1]]
-					if is_unoccupied?([row,move_from[1]]) == false
+			row = move_from[1]
+			until row == move_to[1]
+					row > move_to[1] ? row -= 1 : row += 1
+					path << [move_from[0],row]
+					if is_unoccupied?([move_from[0],row]) == false
 						break
 					end
 				end
@@ -307,13 +309,13 @@ module Chess
 
 		def diagonal_path(move_from, move_to)
 			path = [move_from]
-			row = move_from[0]
-			column = move_from[1]
-			until (row == move_to[0]) && (column == move_to[1])
-				row > move_to[0] ? row -= 1 : row += 1
-				column > move_to[1] ? column -= 1 : column += 1
-				path << [row,column]
-				if is_unoccupied?([row,column]) == false
+			col = move_from[0]
+			row = move_from[1]
+			until (col == move_to[0]) && (row == move_to[1])
+				col > move_to[0] ? col -= 1 : col += 1
+				row > move_to[1] ? row -= 1 : row += 1
+				path << [col,row]
+				if is_unoccupied?([col,row]) == false
 					break
 				end
 			end
@@ -328,10 +330,10 @@ module Chess
 				path = pawn_path(move_from,move_to)
 			elsif (move_from[0] != move_to[0] && move_from[1] != move_to[1]) && !is_pawn?(move_from)
 				path = diagonal_path(move_from,move_to)
-			elsif move_from[1] != move_to[1]
-				path = horizontal_path(move_from,move_to)
 			elsif move_from[0] != move_to[0]
 				path = vertical_path(move_from,move_to)
+			elsif move_from[1] != move_to[1]
+				path = horizontal_path(move_from,move_to)
 			else
 				puts "Movement Error"
 			end

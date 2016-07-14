@@ -52,6 +52,7 @@ module Chess
 				if coord.size != 2
 					p "Please type a letter + number"	
 				else
+					p coord
 					coord = coord.unchessify_coordinates				
 					if (coord[0].match(/[A-H]|[a-h]/)) == false
 						p "invalid column"

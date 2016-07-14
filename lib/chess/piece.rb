@@ -15,24 +15,24 @@ module Chess
 
 		def horizontal_moves
 			move_list = []
-			row = position[0]
-			(1..8).each { |col| move_list << [row,col]}
+			col = position[0]
+			(1..8).each { |row| move_list << [col,row]}
 			move_list
 		end
 
 		def vertical_moves
 			move_list = []
-			col = position[1]
-			(1..8).each { |row| move_list << [row,col]}
+			row = position[1]
+			(1..8).each { |col| move_list << [col,row]}
 			move_list
 		end
 
 		def diagonal_moves
 			move_list = []
-			row = position[0]
-			col = position[1]
+			col = position[0]
+			row = position[1]
 			[[-1,-1],[-1,1],[1,-1],[1,1]].each do |move|
-			new_move = apply_move_to_position(move,[row,col])
+			new_move = apply_move_to_position(move,[col,row])
 				until new_move[0] > 8 || new_move[1] > 8 || new_move[0] < 1 || new_move[1] < 1
 					move_list << new_move if move_list.include?(new_move) == false
 					new_move = apply_move_to_position(move,new_move)
@@ -70,17 +70,17 @@ module Chess
 			def possible_moves
 				possible_moves = []
 				if color == "black"
-					possible_moves += [[1,0],[1,-1],[1,1]]
-					possible_moves += [[2,0]] if first_move?
+					possible_moves += [[0,1],[-1,1],[1,1]]
+					possible_moves += [[0,2]] if first_move?
 				elsif color == "white"
-					possible_moves += [[-1,0],[-1,1],[-1,-1]]
-					possible_moves += [[-2,0]] if first_move?
+					possible_moves += [[0-1],[1,-1],[-1,-1]]
+					possible_moves += [[0,-2]] if first_move?
 				end
 				return possible_moves
 			end
 
 			def first_move?
-				color == "black" && position[0] == 2 || color == "white" && position[0] == 7
+				color == "black" && position[1] == 2 || color == "white" && position[1] == 7
 			end
 
 			def available_moves
