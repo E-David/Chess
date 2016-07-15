@@ -8,8 +8,8 @@ module Chess
 
 		def to_s
 			string = ""
-			grid.each do |col| 
-				col.each do |square| 
+			grid.each do |row| 
+				row.each do |square| 
 					string += square.to_s
 					string += ", " if square.value != ""
 					string += square.value.to_s
@@ -28,20 +28,20 @@ module Chess
 		end
 
 		def coordinate_board
-			grid.each_with_index do |col,col_index| 
-				col.each_with_index do |square,row_index|
+			grid.each_with_index do |row,row_index| 
+				row.each_with_index do |square,col_index|
 					square.coordinate = [col_index,row_index]
 				end
 			end
 		end
 
 		def colorize_board
-			grid.each_with_index do |col,col_index| 
-				col.each_with_index do |square,row_index|
-					if col_index.even?
-						row_index.even? ? square.color = "B" : square.color = "W"
+			grid.each_with_index do |row,row_index| 
+				row.each_with_index do |square,col_index|
+					if row_index.even?
+						col_index.even? ? square.color = "B" : square.color = "W"
 					else
-						row_index.even? ? square.color = "W" : square.color = "B"
+						col_index.even? ? square.color = "W" : square.color = "B"
 					end
 				end
 			end
@@ -65,8 +65,8 @@ module Chess
 
 		def setup_pawns
 			(1..8).each do |col| 
-				set_square([col,2], Pawn.new("black",([col,2])))
-				set_square([col,7], Pawn.new("white",([col,7])))
+				set_square([col,2], Pawn.new("black",[col,7]))
+				set_square([col,7], Pawn.new("white",[col,7]))
 			end
 		end
 
@@ -93,8 +93,6 @@ module Chess
 			end
 		end
 
-
-
 		def display_board
 			grid.each do |row|
 				display = ""
@@ -107,7 +105,7 @@ module Chess
 		end
 
 		def get_square(coordinate)
-			grid[coordinate[0]][coordinate[1]]
+			grid[coordinate[1]][coordinate[0]]
 		end
 
 		def get_piece(coordinate)
@@ -234,7 +232,7 @@ module Chess
 		def show_legal_moves(coordinate)
 			piece = get_piece(coordinate)
 			legal_moves = piece.valid_moves.select { |move| check_move(piece.position,move) == true }
-			legal_moves.chessify_coordinates.join(",")
+			legal_moves.empty? ? false : legal_moves.map { |move| move.chessify_coordinates }
 		end
 
 		def move_piece(coordinate_from,coordinate_to)

@@ -23,47 +23,22 @@ module Chess
 			@current_player,@other_player = @other_player,@current_player
 		end
 
-		def get_column
-			while col = gets.chomp
-				if col.match(/[A-H]|[a-h]/)
-					col = col.upcase.letter_to_number
-					break
-				else
-					p "invalid input"
-				end
-			end
-			col
-		end
-
-		def get_row
-			while row = gets.to_i
-				if row >= 1 && row <= 8
-					row = row.reverse_number
-					break
-				else
-					p "invalid input"
-				end
-			end
-			row
-		end
-
 		def get_coordinate
 			while coord = gets.chomp.split("")
 				if coord.size != 2
 					p "Please type a letter + number"	
-				else
-					p coord
-					coord = coord.unchessify_coordinates				
+				else		
 					if (coord[0].match(/[A-H]|[a-h]/)) == false
 						p "invalid column"
-					elsif (coord[1] >= 1 && coord[1] <= 8) == false
+					elsif (coord[1].to_i >= 1 && coord[1].to_i <= 8) == false
 						p "invalid row"
 					else
+						coord[1] = coord[1].to_i
 						break
 					end
 				end
 			end
-			coord
+			coord.unchessify_coordinates
 		end
 
 		def validate_move_from(coordinate)
@@ -86,7 +61,7 @@ module Chess
 					p board.get_piece(move_from).to_s
 					if validate_move_from(move_from) == false
 						p "You did not select a piece of your color"
-					elsif board.show_legal_moves(move_from).empty?
+					elsif board.show_legal_moves(move_from) == false
 						p "No available moves for this piece"
 					else
 						p "Available Moves: #{board.show_legal_moves(move_from)}"

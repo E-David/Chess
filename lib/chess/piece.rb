@@ -73,7 +73,7 @@ module Chess
 					possible_moves += [[0,1],[-1,1],[1,1]]
 					possible_moves += [[0,2]] if first_move?
 				elsif color == "white"
-					possible_moves += [[0-1],[1,-1],[-1,-1]]
+					possible_moves += [[0,-1],[1,-1],[-1,-1]]
 					possible_moves += [[0,-2]] if first_move?
 				end
 				return possible_moves
