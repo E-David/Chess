@@ -65,7 +65,7 @@ module Chess
 
 		def setup_pawns
 			(1..8).each do |col| 
-				set_square([col,2], Pawn.new("black",[col,7]))
+				set_square([col,2], Pawn.new("black",[col,2]))
 				set_square([col,7], Pawn.new("white",[col,7]))
 			end
 		end
@@ -104,6 +104,7 @@ module Chess
 			end
 		end
 
+		#gets [column,row] from provided coordinate
 		def get_square(coordinate)
 			grid[coordinate[1]][coordinate[0]]
 		end
@@ -229,10 +230,14 @@ module Chess
 			piece.position = coordinate if piece != ""
 		end
 
-		def show_legal_moves(coordinate)
+		def get_legal_moves(coordinate)
 			piece = get_piece(coordinate)
-			legal_moves = piece.valid_moves.select { |move| check_move(piece.position,move) == true }
-			legal_moves.empty? ? false : legal_moves.map { |move| move.chessify_coordinates }
+			piece.valid_moves.select { |move| check_move(piece.position,move) == true }
+		end
+
+		def show_legal_moves(coordinate)
+			legal_moves = get_legal_moves(coordinate)
+			legal_moves.map { |move| move.chessify_coordinates.join }
 		end
 
 		def move_piece(coordinate_from,coordinate_to)

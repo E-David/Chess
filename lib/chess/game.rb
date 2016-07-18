@@ -26,23 +26,23 @@ module Chess
 		def get_coordinate
 			while coord = gets.chomp.split("")
 				if coord.size != 2
-					p "Please type a letter + number"	
+					puts "Please type a letter + number"	
 				else		
-					if (coord[0].match(/[A-H]|[a-h]/)) == false
-						p "invalid column"
+					if !coord[0].match(/[A-H]|[a-h]/)
+						puts "invalid column"
 					elsif (coord[1].to_i >= 1 && coord[1].to_i <= 8) == false
-						p "invalid row"
+						puts "invalid row"
 					else
-						coord[1] = coord[1].to_i
 						break
 					end
 				end
 			end
+			coord[1] = coord[1].to_i
 			coord.unchessify_coordinates
 		end
 
 		def validate_move_from(coordinate)
-			return false if board.get_piece(coordinate) == ""
+			return false if board.is_unoccupied?(coordinate)
 			board.get_piece(coordinate).color == current_player.color
 		end
 
@@ -52,31 +52,33 @@ module Chess
 		end
 
 		def play_game
-			p "#{current_player.name} has been randomly chosen to go first."
+			puts "#{current_player.name} has been randomly chosen to go first."
 			puts ""
 			while true
 				board.display_board
-				p "#{current_player.name}, choose a piece to move"
-				while move_from = get_coordinate
-					p board.get_piece(move_from).to_s
+				until false 
+					puts "#{current_player.name}, choose a piece to move"
+					move_from = get_coordinate
+					puts board.get_piece(move_from).to_s
 					if validate_move_from(move_from) == false
-						p "You did not select a piece of your color"
-					elsif board.show_legal_moves(move_from) == false
-						p "No available moves for this piece"
+						puts "You did not select a piece of your color"
+					elsif board.get_legal_moves(move_from).empty?
+						puts "No available moves for this piece"
 					else
-						p "Available Moves: #{board.show_legal_moves(move_from)}"
+						puts "Available moves: #{board.show_legal_moves(move_from)}"
 						break
 					end
 				end
 
-				p "#{current_player.name}, choose a destination"
-				while move_to = get_coordinate
-					p board.get_piece(move_to).to_s if board.get_piece(move_to) != ""
+				until false 
+					puts "#{current_player.name}, choose a destination"
+					move_to = get_coordinate
+					puts board.get_piece(move_to).to_s if board.get_piece(move_to) != ""
 					if board.check_move(move_from,move_to) == true
 						board.move_piece(move_from,move_to)
 						break
 					else
-						p board.check_move(move_from,move_to)
+						puts board.check_move(move_from,move_to)
 					end
 				end
 
