@@ -1,7 +1,6 @@
 module Chess
 	class Player
-		attr_accessor :color
-		attr_reader  :name
+		attr_accessor :name, :color
 		def initialize(name, color)
 			@name = name
 			@color = color

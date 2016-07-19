@@ -1,22 +1,79 @@
+require 'yaml'
+
 module Chess
 	class Game
-		attr_accessor :players
-		attr_reader :board, :current_player, :other_player
+		attr_accessor :players, :current_player, :other_player, :board 
 		def initialize(board = Board.new)
 			@board = board
-			@players = get_players
-			@current_player,@other_player = players.shuffle
-			@current_player.color = "white"
-			@other_player.color = "black"
+			@players = players
+			@current_player = current_player
+			@other_player = other_player
+			check_for_file			
+		end
+
+		def check_for_file
+			if File.exists?("file.txt")
+				puts "saved game found. Type new to begin a new game or load to continue this game."
+				while answer = gets.chomp.downcase
+					if answer == "new"
+						game_setup
+					elsif answer == "load"
+						load_game
+					else
+						p "invalid response"
+						check_for_file
+					end
+				end
+			else
+				game_setup
+			end
+		end
+
+		def save_game
+			File.open("file.txt", "w") do |file| 
+				file.puts "#{current_player.name}"
+				file.puts "#{current_player.color}"
+				file.puts "#{other_player.name}"
+				file.puts "#{other_player.color}"
+				file.puts "#{board}"
+			end
+			puts "Game saved!" if File.exists?("file.txt")
+		end
+
+		def load_game
+			game = File.open("file.txt", "r")
+			game_lines = game.readlines.each { |line| line.chomp! }
+			game.close
+			@current_player = Chess::Player.new(YAML::load(game_lines[0]),YAML::load(game_lines[1]))
+			@other_player = Chess::Player.new(YAML::load(game_lines[2]),YAML::load(game_lines[3]))
+			@board = YAML::load(game_lines[4])
+			play_game
+		end
+
+		def load_board_pieces(board_pieces)
+			board_pieces.each do |loading_piece|
+				load_pieces(coordinate, piece_name, piece_color)
+			end
+		end
+
+		def game_setup
+			get_players
+			set_players
 			play_game
 		end
 
 		def get_players
 			puts "Player 1, please type your name:"
-			player_1 = "Harry"
+			player_1 = gets.chomp
 			puts "Player 2, please type your name:"
-			player_2 = "Marge"
+			player_2 = gets.chomp
 			@players = [Chess::Player.new(player_1,""), Chess::Player.new(player_2,"")]
+		end
+
+		def set_players
+			@current_player,@other_player = players.shuffle
+			@current_player.color = "white"
+			@other_player.color = "black"
 		end
 
 		def switch_player
@@ -88,6 +145,26 @@ module Chess
 					break
 				else
 					switch_player
+					save_game
+				end
+			end
+			restart?
+		end
+
+		def restart?
+			prompt = "Would you like to play again?"
+			puts prompt
+			while answer = gets.chomp
+				if answer == "yes" || answer == "y" || answer == "1"
+					x = Chess::Game.new
+					x.play_game
+					break
+				elsif answer == "no" || answer == "n" || answer == "0"
+					p "Thanks for playing Chess!"
+					break
+				else
+					p "invalid input"
+					puts prompt
 				end
 			end
 		end

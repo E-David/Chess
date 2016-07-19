@@ -93,6 +93,11 @@ module Chess
 			end
 		end
 
+		def load_pieces(coordinate, piece_name, piece_color)
+			piece_class = Chess.const_get(piece_name)
+			set_square(coordinate, piece_class.new(piece_color,coordinate))
+		end
+
 		def display_board
 			grid.each do |row|
 				display = ""
