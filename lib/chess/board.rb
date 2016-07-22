@@ -224,10 +224,7 @@ module Chess
 		end
 
 		def checkmate?(color)
-			return "Can eliminate check piece" if eliminate_check_piece(color)
-			return "King can move out of check" if king_trapped(color) == false
-			return "Can block check path" if block_check_path(color)
-			true
+			!eliminate_check_piece(color) && king_trapped(color) == false && !block_check_path(color)
 		end
 
 		def set_square(coordinate,piece="")
@@ -338,9 +335,9 @@ module Chess
 				path = pawn_path(move_from,move_to)
 			elsif (move_from[0] != move_to[0] && move_from[1] != move_to[1]) && !is_pawn?(move_from)
 				path = diagonal_path(move_from,move_to)
-			elsif move_from[0] != move_to[0]
-				path = vertical_path(move_from,move_to)
 			elsif move_from[1] != move_to[1]
+				path = vertical_path(move_from,move_to)
+			elsif move_from[0] != move_to[0]
 				path = horizontal_path(move_from,move_to)
 			else
 				puts "Movement Error"
@@ -376,7 +373,7 @@ module Chess
 
 		def winner?(color)
 			if check?(color)
-				checkmate?(color) ? true : (p "#{color} king is in check!")
+				p checkmate?(color) #== true ? true : (p "#{color} king is in check!")
 			end
 		end
 
