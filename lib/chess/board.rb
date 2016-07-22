@@ -39,9 +39,9 @@ module Chess
 			grid.each_with_index do |row,row_index| 
 				row.each_with_index do |square,col_index|
 					if row_index.even?
-						col_index.even? ? square.color = "B" : square.color = "W"
+						col_index.even? ? square.color = "BB" : square.color = "WW"
 					else
-						col_index.even? ? square.color = "W" : square.color = "B"
+						col_index.even? ? square.color = "WW" : square.color = "BB"
 					end
 				end
 			end
@@ -51,7 +51,7 @@ module Chess
 			grid.each_with_index do |row, row_index| 
 				row.each_with_index do |square, col_index|
 					if row_index == 0
-						col_index == 0 ? square.color = "_" : square.color = ("A".."H").to_a[col_index - 1]
+						col_index == 0 ? square.color = "_" : square.color = ("A".."H").to_a[col_index - 1] * 2
 					end
 
 					if col_index == 0
@@ -102,7 +102,7 @@ module Chess
 			grid.each do |row|
 				display = ""
 				row.each do |square|
-					piece_display = square.value.class.name == "String" ? square.color : square.value.unicode_char
+					piece_display = square.value.class.name == "String" ? square.color : square.value.text_char
 					display += square.value.class.name == "String" ? "  #{piece_display}  " : "  #{piece_display}  "
 				end
 				puts display

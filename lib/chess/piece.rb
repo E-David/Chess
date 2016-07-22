@@ -57,11 +57,12 @@ module Chess
 	end
 
 		class Pawn < Piece
-			attr_reader :valid_moves, :unicode_char
+			attr_reader :valid_moves, :unicode_char, :text_char
 			attr_accessor :position
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265F" : "\u2659"
+				@text_char = 	color == "black" ? "bP" : "wP"
 				@valid_moves = validate_move
 			end
 
@@ -91,11 +92,12 @@ module Chess
 		end
 
 		class Rook < Piece
-			attr_reader :valid_moves, :unicode_char
+			attr_reader :valid_moves, :unicode_char, :text_char
 			attr_accessor :position
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265C" : "\u2656"
+				@text_char	  = color == "black" ? "bR" : "wR"
 				@valid_moves = possible_moves
 			end
 
@@ -108,11 +110,12 @@ module Chess
 		end
 
 		class Knight < Piece
-			attr_reader :valid_moves, :unicode_char
+			attr_reader :valid_moves, :unicode_char, :text_char
 			attr_accessor :position
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265E" : "\u2658"
+				@text_char	  = color == "black" ? "bN" : "wN"
 				@valid_moves = validate_move
 			end
 
@@ -131,11 +134,12 @@ module Chess
 		end
 		
 		class Bishop < Piece
-			attr_reader :valid_moves, :unicode_char
+			attr_reader :valid_moves, :unicode_char, :text_char
 			attr_accessor :position
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265D" : "\u2657"
+				@text_char	  = color == "black" ? "bB" : "wB"
 				@valid_moves = possible_moves
 			end
 
@@ -146,11 +150,12 @@ module Chess
 		end
 
 		class Queen < Piece
-			attr_reader :valid_moves, :unicode_char
+			attr_reader :valid_moves, :unicode_char, :text_char
 			attr_accessor :position
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265B" : "\u2655"
+				@text_char	  = color == "black" ? "bQ" : "wQ"
 				@valid_moves = possible_moves
 			end
 
@@ -164,11 +169,12 @@ module Chess
 		end
 		
 		class King < Piece
-			attr_reader :valid_moves, :unicode_char
+			attr_reader :valid_moves, :unicode_char, :text_char
 			attr_accessor :position
 			def initialize(color, position)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265A" : "\u2654"
+				@text_char	  = color == "black" ? "bK" : "wK"
 				@valid_moves = validate_move(available_moves)
 			end
 

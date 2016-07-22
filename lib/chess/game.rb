@@ -12,7 +12,7 @@ module Chess
 		end
 
 		def check_for_file
-			if File.exists?("file.txt")
+			if File.exists?("file.yml")
 				puts "saved game found. Type new to begin a new game or load to continue this game."
 				while answer = gets.chomp.downcase
 					if answer == "new"
@@ -30,30 +30,18 @@ module Chess
 		end
 
 		def save_game
-			File.open("file.txt", "w") do |file| 
-				file.puts "#{current_player.name}"
-				file.puts "#{current_player.color}"
-				file.puts "#{other_player.name}"
-				file.puts "#{other_player.color}"
-				file.puts "#{board}"
+			File.open("file.yml", "w") do |f| 
+				f.write YAML::dump(self)
 			end
-			puts "Game saved!" if File.exists?("file.txt")
+			puts "Game saved!" if File.exists?("file.yml")
 		end
 
 		def load_game
-			game = File.open("file.txt", "r")
-			game_lines = game.readlines.each { |line| line.chomp! }
-			game.close
-			@current_player = Chess::Player.new(YAML::load(game_lines[0]),YAML::load(game_lines[1]))
-			@other_player = Chess::Player.new(YAML::load(game_lines[2]),YAML::load(game_lines[3]))
-			@board = YAML::load(game_lines[4])
+			game = YAML::load(File.read("file.yml"))
+			self.current_player = game.current_player
+      		self.other_player = game.other_player
+      		self.board = game.board
 			play_game
-		end
-
-		def load_board_pieces(board_pieces)
-			board_pieces.each do |loading_piece|
-				load_pieces(coordinate, piece_name, piece_color)
-			end
 		end
 
 		def game_setup
