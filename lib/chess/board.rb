@@ -93,11 +93,6 @@ module Chess
 			end
 		end
 
-		def load_pieces(coordinate, piece_name, piece_color)
-			piece_class = Chess.const_get(piece_name)
-			set_square(coordinate, piece_class.new(piece_color,coordinate))
-		end
-
 		def display_board
 			grid.each do |row|
 				display = ""
@@ -125,13 +120,11 @@ module Chess
 		end
 
 		def ally_pieces(color)
-			ally_pieces = all_pieces.select { |piece| piece.color == color && piece.piece_name != "King" }
-			ally_pieces
+			all_pieces.select { |piece| piece.color == color && piece.piece_name != "King" }
 		end
 
 		def enemy_pieces(color)
-			enemy_pieces = all_pieces.select { |piece| piece.color != color }
-			enemy_pieces
+			all_pieces.select { |piece| piece.color != color }
 		end
 
 		def get_king(color)
@@ -169,20 +162,20 @@ module Chess
 			#then checks if the ally piece can move to this intersection. 
 			#Finally, returns all pieces that can block the check path
 		def block_check_path(color)
-			can_block = ""
+			blocking_piece = []
 			get_check_paths(color).each do |path|
 				ally_pieces(color).each do |piece|
 					intersections = piece.valid_moves & path
 					if intersections.size >= 1
 						intersections.each do |intersection| 
 							if check_move(piece.position,intersection) == true
-								can_block = true if still_in_check?(piece.position,intersection,color) == false
+								blocking_piece << piece if still_in_check?(piece.position,intersection,color) == false
 							end
 						end
 					end
 				end
 			end
-			can_block
+			blocking_piece
 		end
 
 		def possible_moves(coord)
@@ -191,25 +184,33 @@ module Chess
 		end
 		
 		def possible_king_moves(king)
-			king.valid_moves.select { |move| check_move(king.position,move) && is_unoccupied?(move) }
+			king.valid_moves.select do |move| 
+				check_move(king.position,move) && (is_unoccupied?(move) || !is_ally?(king.position,move))
+			end
 		end
 
-		def king_trapped(color)
+		def valid_king_moves(color)
+			king_moves = []
 			king = get_king(color)
 			original_position = king.position
-			possible_king_moves(king).all? do |king_move|
-				still_in_check?(king.position,king_move,color) == true
+			possible_king_moves(king).each do |king_move|
+				king_moves << king_move if still_in_check?(king.position,king_move,color) == false
 			end
+			king_moves
 		end
 
 		def eliminate_check_piece(color)
-			get_check_piece_positions(color).any? do |check_piece_position|
-				ally_pieces(color).any? do |ally_piece|
+			eliminating_pieces = []
+			get_check_piece_positions(color).each do |check_piece_position|
+				ally_pieces(color).each do |ally_piece|
 					if check_move(ally_piece.position,check_piece_position) == true
-						still_in_check?(ally_piece.position,check_piece_position,color) == false
+						if still_in_check?(ally_piece.position,check_piece_position,color) == false
+							eliminating_pieces << ally_piece
+						end
 					end
 				end
 			end
+			eliminating_pieces
 		end
 
 		def still_in_check?(move_from,move_to,color)
@@ -224,7 +225,25 @@ module Chess
 		end
 
 		def checkmate?(color)
-			!eliminate_check_piece(color) && king_trapped(color) == false && !block_check_path(color)
+			if eliminate_check_piece(color).empty? && valid_king_moves(color).empty? && block_check_path(color).empty?
+				return true
+			else
+				stop_check(color)
+			end
+		end
+
+		def stop_check(color)
+			if !eliminate_check_piece(color).empty?
+				puts "you can eliminate the checking piece with: #{ chessify_moves(eliminate_check_piece(color)) }"
+			end
+
+			if !valid_king_moves(color).empty?
+				puts "you can move your king out of check here: #{ chessify_moves(valid_king_moves(color)) }"
+			end
+
+			if !block_check_path(color).empty?
+				puts "you can block one checking piece with: #{ chessify_moves(block_check_path(color)) } "
+			end
 		end
 
 		def set_square(coordinate,piece="")
@@ -239,7 +258,11 @@ module Chess
 
 		def show_legal_moves(coordinate)
 			legal_moves = get_legal_moves(coordinate)
-			legal_moves.map { |move| move.chessify_coordinates.join }
+			chessify_moves(legal_moves)
+		end
+
+		def chessify_moves(array)
+			array.map { |move| move.chessify_coordinates.join }
 		end
 
 		def move_piece(coordinate_from,coordinate_to)
@@ -351,9 +374,11 @@ module Chess
 		end
 
 		def check_move(move_from, move_to)
+			color = get_piece(move_from).color
 			return "Invalid move" if is_valid_move?(move_from,move_to) == false
 			return "Target destination is an ally" if is_ally?(move_from,move_to)
 			return "Move is blocked by another piece" if move_unhindered?(move_from,move_to) == false
+			return "Move would put your King in check" if still_in_check?(move_from,move_to,color) == true
 			true
 		end
 
@@ -373,13 +398,14 @@ module Chess
 
 		def winner?(color)
 			if check?(color)
-				p checkmate?(color) #== true ? true : (p "#{color} king is in check!")
+				checkmate?(color) == true
 			end
 		end
 
 		def draw?(color)
-			check?(color) == false
-			valid_moves_exist?(color) == false
+			if check?(color) == false
+				valid_moves_exist?(color) == false
+			end
 		end
 
 		private
