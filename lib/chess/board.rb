@@ -160,22 +160,22 @@ module Chess
 		end
 			#Uses the & method to find common elements (an intersection) between given path and ally piece valid moves
 			#then checks if the ally piece can move to this intersection. 
-			#Finally, returns all pieces that can block the check path
+			#Finally, returns all piece positions that can block the check path
 		def block_check_path(color)
-			blocking_piece = []
+			blocking_pieces = []
 			get_check_paths(color).each do |path|
 				ally_pieces(color).each do |piece|
 					intersections = piece.valid_moves & path
 					if intersections.size >= 1
 						intersections.each do |intersection| 
 							if check_move(piece.position,intersection) == true
-								blocking_piece << piece if still_in_check?(piece.position,intersection,color) == false
+								blocking_pieces << piece.position if still_in_check?(piece.position,intersection,color) == false
 							end
 						end
 					end
 				end
 			end
-			blocking_piece
+			blocking_pieces
 		end
 
 		def possible_moves(coord)
@@ -205,7 +205,7 @@ module Chess
 				ally_pieces(color).each do |ally_piece|
 					if check_move(ally_piece.position,check_piece_position) == true
 						if still_in_check?(ally_piece.position,check_piece_position,color) == false
-							eliminating_pieces << ally_piece
+							eliminating_pieces << ally_piece.position
 						end
 					end
 				end
