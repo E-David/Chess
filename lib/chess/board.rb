@@ -133,13 +133,14 @@ module Chess
 
 		def get_all_check_pieces(color)
 			king = get_king(color)
-			enemy_pieces(color).each { |piece| piece.valid_moves.include?(king.position) }
+			enemy_pieces(color).select { |piece| piece.valid_moves.include?(king.position) }
 		end
 
 		def get_valid_check_pieces(color)
-			all_check_pieces = get_all_check_pieces(color)
 			king = get_king(color)
-			all_check_pieces.select { |piece| check_move(piece.position,king.position) == true }
+			get_all_check_pieces(color).select do |piece| 
+				(is_king?(piece.position) || check_move(piece.position,king.position)) == true
+			end
 		end
 
 		def get_check_piece_positions(color)
@@ -214,7 +215,6 @@ module Chess
 		end
 
 		def still_in_check?(move_from,move_to,color)
-			check = ""
 			original_from_piece = get_piece(move_from)
 			original_to_piece = get_piece(move_to)
 			move_piece(move_from,move_to)
@@ -294,6 +294,12 @@ module Chess
 		def is_pawn?(coordinate)
 			piece = get_piece(coordinate)
 			piece.piece_name == "Pawn"
+		end
+
+		def is_king?(coordinate)
+			piece = get_piece(coordinate)
+			return false if piece == ""
+			piece.piece_name == "King"
 		end
 
 		# check if piece is moving diagonally. If yes, returns if destination is occupied and an enemy
