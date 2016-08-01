@@ -217,7 +217,7 @@ module Chess
 		def still_in_check?(move_from,move_to,color)
 			original_from_piece = get_piece(move_from)
 			original_to_piece = get_piece(move_to)
-			move_piece(move_from,move_to)
+			false_move_piece(move_from,move_to)
 			check = check?(color)
 			set_square(move_from,original_from_piece)
 			set_square(move_to,original_to_piece)
@@ -265,10 +265,25 @@ module Chess
 			array.map { |move| move.chessify_coordinates.join }
 		end
 
-		def move_piece(coordinate_from,coordinate_to)
+		#used for still_in_check? call to see if a move would put/keep king in check
+		def false_move_piece(coordinate_from,coordinate_to)
 			piece = get_piece(coordinate_from)
 			piece_class = Chess.const_get(piece.piece_name)
 			set_square(coordinate_to, piece_class.new(piece.color,coordinate_to))
+			erase_square(coordinate_from)
+		end
+
+		#vs. false move_piece method. When called, move count goes up and pieces are moved permanently
+		def move_piece(coordinate_from,coordinate_to)
+			piece = get_piece(coordinate_from)
+			move_num = piece.move_number
+			piece_class = Chess.const_get(piece.piece_name)
+			en_passant(coordinate_from,coordinate_to) if en_passant_move?(coordinate_from,coordinate_to)
+			set_square(coordinate_to, piece_class.new(piece.color,coordinate_to,move_num + 1))
+			erase_square(coordinate_from)
+		end
+
+		def erase_square(coordinate_from)
 			set_square(coordinate_from)
 		end
 
@@ -308,7 +323,8 @@ module Chess
 			path = [move_from]
 			row = move_from[1]
 			if (move_from[0] != move_to[0] && move_from[1] != move_to[1])
-				if is_unoccupied?(move_to) == false && is_ally?(move_from,move_to) == false
+				if is_ally?(move_from,move_to) == false && 
+				(is_unoccupied?(move_to) == false || en_passant_move?(move_from,move_to) == true)
 					path << move_to
 				end
 			else 
@@ -385,6 +401,27 @@ module Chess
 		def move_unhindered?(move_from,move_to)
 			path = get_path(move_from,move_to)
 			path.last == move_to
+		end
+
+		def get_en_passant_piece(move_from,move_to)
+			ally_piece = get_piece(move_from)
+			col = move_to[0]
+			row = move_to[1]
+			ally_piece.color == "black" ? row -= 1 : row += 1
+			get_piece([col,row])
+		end
+
+		def en_passant_move?(move_from,move_to)
+			enemy_piece = get_en_passant_piece(move_from,move_to)
+			return false if enemy_piece == ""
+			if is_pawn?(move_from) && is_pawn?(enemy_piece.position)
+				enemy_piece.move_number == 1
+			end
+		end
+
+		def en_passant(move_from,move_to)
+			enemy_piece = get_en_passant_piece(move_from,move_to)
+			erase_square(enemy_piece.position)
 		end
 
 		def check_move(move_from, move_to)
