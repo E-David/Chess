@@ -47,6 +47,7 @@ module Chess
 		def game_setup
 			get_players
 			set_players
+			puts "#{current_player.name} has been randomly chosen to go first."
 			play_game
 		end
 
@@ -93,12 +94,10 @@ module Chess
 
 		def game_over_message
 			return "#{current_player.name} wins!" if board.game_over(other_player.color) == :winner
-			return "Stalemate!" if board.game_over(other_player.color) == :draw 
+			return "Stalemate!" if board.game_over(other_player.color) == :stalemate
 		end
 
 		def play_game
-			puts "#{current_player.name} has been randomly chosen to go first."
-			puts ""
 			while true
 				board.display_board
 				until false 

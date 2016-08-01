@@ -303,14 +303,22 @@ module Chess
 		end
 
 		# check if piece is moving diagonally. If yes, returns if destination is occupied and an enemy
+		# if no, basically calls vertical_path method, but doesn't add move unless move is unoccupied
 		def pawn_path(move_from,move_to)
 			path = [move_from]
+			row = move_from[1]
 			if (move_from[0] != move_to[0] && move_from[1] != move_to[1])
 				if is_unoccupied?(move_to) == false && is_ally?(move_from,move_to) == false
 					path << move_to
 				end
 			else 
-				path << move_to if is_unoccupied?(move_to)
+				until row == move_to[1]
+					row > move_to[1] ? row -= 1 : row += 1
+					if is_unoccupied?([move_from[0],row]) == false
+						break
+					end
+					path << [move_from[0],row]
+				end
 			end
 			path
 		end
@@ -332,12 +340,12 @@ module Chess
 			path = [move_from]
 			row = move_from[1]
 			until row == move_to[1]
-					row > move_to[1] ? row -= 1 : row += 1
-					path << [move_from[0],row]
-					if is_unoccupied?([move_from[0],row]) == false
-						break
-					end
+				row > move_to[1] ? row -= 1 : row += 1
+				path << [move_from[0],row]
+				if is_unoccupied?([move_from[0],row]) == false
+					break
 				end
+			end
 			path
 		end
 
@@ -398,7 +406,7 @@ module Chess
 
 		def game_over(color)
 			return :winner if winner?(color)
-			return :draw if draw?(color)
+			return :stalemate if stalemate?(color)
 			false
 		end
 
@@ -408,7 +416,7 @@ module Chess
 			end
 		end
 
-		def draw?(color)
+		def stalemate?(color)
 			if check?(color) == false
 				valid_moves_exist?(color) == false
 			end
