@@ -180,13 +180,18 @@ module Chess
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265A" : "\u2654"
 				@text_char	  = color == "black" ? "bK" : "wK"
-				@valid_moves = validate_move(available_moves)
 				@move_number = move_number
+				@valid_moves = validate_move(available_moves)
 			end
 
 			def possible_moves
 				possible_moves = [[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-1,-1]]
-				return possible_moves
+				if move_number == 0
+					#used for castling. If king hasn't moved, it can move to the left or the right two spaces.
+					possible_moves << [2,0]
+					possible_moves << [-2,0]
+				end
+				possible_moves
 			end
 
 			def available_moves

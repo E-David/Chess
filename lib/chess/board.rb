@@ -224,6 +224,22 @@ module Chess
 			check
 		end
 
+		#code for working game,but change it ASAP
+		def castling_still_in_check?(king_move_from,king_move_to,rook_move_from,rook_move_to,color)
+			original_king_from = get_piece(king_move_from)
+			original_king_to = get_piece(king_move_to)
+			original_rook_from = get_piece(rook_move_from)
+			original_rook_to = get_piece(rook_move_to)
+			false_move_piece(king_move_from,king_move_to)
+			false_move_piece(rook_move_from,rook_move_to)
+			check = check?(color)
+			set_square(king_move_from,original_king_from)
+			set_square(king_move_to,original_king_to)
+			set_square(rook_move_from,original_rook_from)
+			set_square(rook_move_to,original_rook_to)
+			check
+		end
+
 		def checkmate?(color)
 			if eliminate_check_piece(color).empty? && valid_king_moves(color).empty? && block_check_path(color).empty?
 				return true
@@ -262,7 +278,7 @@ module Chess
 		end
 
 		def chessify_moves(array)
-			array.map { |move| move.chessify_coordinates.join }
+			array.map { |move| move.chessify_coordinates.join }.sort
 		end
 
 		#used for still_in_check? call to see if a move would put/keep king in check
@@ -315,6 +331,12 @@ module Chess
 			piece = get_piece(coordinate)
 			return false if piece == ""
 			piece.piece_name == "King"
+		end
+
+		def is_rook?(coordinate)
+			piece = get_piece(coordinate)
+			return false if piece == ""
+			piece.piece_name == "Rook"
 		end
 
 		# check if piece is moving diagonally. If yes, returns if destination is occupied and an enemy
@@ -412,9 +434,10 @@ module Chess
 		end
 
 		def en_passant_move?(move_from,move_to)
+			return false if !is_pawn?(move_from)
 			enemy_piece = get_en_passant_piece(move_from,move_to)
 			return false if enemy_piece == ""
-			if is_pawn?(move_from) && is_pawn?(enemy_piece.position)
+			if  is_pawn?(enemy_piece.position)
 				enemy_piece.move_number == 1
 			end
 		end
@@ -424,12 +447,51 @@ module Chess
 			erase_square(enemy_piece.position)
 		end
 
+		def is_castling?(move_from,move_to)
+			return false if !is_king?(move_from) || move_to[0].abs != 2
+			king = get_piece(move_from)
+			rook = get_castling_rook(move_from,move_to)
+			return false if !is_rook?(rook.position)
+			(king.move_number == 0 && rook.move_number == 0)
+		end
+
+		def get_castling_rook(move_from,move_to)
+			col = move_from[0]
+			row = move_from[1]
+			(col - move_to[0] ) > 0 ? col -= 4 : col += 3
+			get_piece([col,row])
+		end
+
+		def get_casling_rook_move_to(king,rook)
+			rook_col = rook[0]
+			rook_row = rook[1]
+			king[0] > rook_col ? rook_col += 3 : rook_col -= 2
+			[rook_col,rook_row]
+		end
+
+		def castling_move(move_from,move_to)
+			king = get_piece(move_from)
+			rook = get_castling_rook(move_from,move_to)
+			rook_move_from = rook.position
+			rook_move_to = get_casling_rook_move_to(king.position,rook.position)
+			if move_unhindered?(rook_move_from,rook_move_to) == false
+				return "Rook is blocked by another piece" 
+			elsif
+				castling_still_in_check?(move_from,move_to,rook_move_from,rook_move_to,king.color)
+				return "Move would put King in check" 
+			else
+				move_piece(move_from,move_to)
+				move_piece(rook_move_from,rook_move_to)
+			end
+		end
+
 		def check_move(move_from, move_to)
 			color = get_piece(move_from).color
 			return "Invalid move" if is_valid_move?(move_from,move_to) == false
-			return "Target destination is an ally" if is_ally?(move_from,move_to)
+			return "Target destination is an ally" if is_ally?(move_from,move_to) == true
 			return "Move is blocked by another piece" if move_unhindered?(move_from,move_to) == false
 			return "Move would put your King in check" if still_in_check?(move_from,move_to,color) == true
+			return castling_move(move_from, move_to) if is_castling?(move_from,move_to) == true
 			true
 		end
 
