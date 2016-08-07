@@ -98,7 +98,7 @@ module Chess
 				display = ""
 				row.each do |square|
 					piece_display = square.value.class.name == "String" ? square.color : square.value.text_char
-					display += square.value.class.name == "String" ? "  #{piece_display}  " : "  #{piece_display}  "
+					display += "  #{piece_display}  "
 				end
 				puts display
 			end
@@ -139,7 +139,7 @@ module Chess
 		def get_valid_check_pieces(color)
 			king = get_king(color)
 			get_all_check_pieces(color).select do |piece| 
-				(is_king?(piece.position) || check_move(piece.position,king.position)) == true
+				(is_specified_piece?("King",piece.position) || check_move(piece.position,king.position)) == true
 			end
 		end
 
@@ -317,26 +317,10 @@ module Chess
 			piece.valid_moves.include?(move_to)
 		end
 
-		def is_knight?(coordinate)
-			piece = get_piece(coordinate)
-			piece.piece_name == "Knight"
-		end
-
-		def is_pawn?(coordinate)
-			piece = get_piece(coordinate)
-			piece.piece_name == "Pawn"
-		end
-
-		def is_king?(coordinate)
+		def is_specified_piece?(name,coordinate)
 			piece = get_piece(coordinate)
 			return false if piece == ""
-			piece.piece_name == "King"
-		end
-
-		def is_rook?(coordinate)
-			piece = get_piece(coordinate)
-			return false if piece == ""
-			piece.piece_name == "Rook"
+			piece.piece_name == name
 		end
 
 		# check if piece is moving diagonally. If yes, returns if destination is occupied and an enemy
@@ -404,11 +388,11 @@ module Chess
 
 		def get_path(move_from,move_to)
 			path = []
-			if is_knight?(move_from) 
+			if is_specified_piece?("Knight",move_from) 
 				path = [move_to]
-			elsif is_pawn?(move_from)
+			elsif is_specified_piece?("Pawn",move_from)
 				path = pawn_path(move_from,move_to)
-			elsif (move_from[0] != move_to[0] && move_from[1] != move_to[1]) && !is_pawn?(move_from)
+			elsif (move_from[0] != move_to[0] && move_from[1] != move_to[1])
 				path = diagonal_path(move_from,move_to)
 			elsif move_from[1] != move_to[1]
 				path = vertical_path(move_from,move_to)
@@ -434,10 +418,10 @@ module Chess
 		end
 
 		def en_passant_move?(move_from,move_to)
-			return false if !is_pawn?(move_from)
+			return false if !is_specified_piece?("Pawn",move_from)
 			enemy_piece = get_en_passant_piece(move_from,move_to)
 			return false if enemy_piece == ""
-			if  is_pawn?(enemy_piece.position)
+			if  is_specified_piece?("Pawn",enemy_piece.position)
 				enemy_piece.move_number == 1
 			end
 		end
@@ -448,10 +432,10 @@ module Chess
 		end
 
 		def is_castling?(move_from,move_to)
-			return false if !is_king?(move_from) || move_to[0].abs != 2
+			return false if !is_specified_piece?("King",move_from) || move_to[0].abs != 2
 			king = get_piece(move_from)
 			rook = get_castling_rook(move_from,move_to)
-			return false if !is_rook?(rook.position)
+			return false if !is_specified_piece?("Rook",rook.position)
 			(king.move_number == 0 && rook.move_number == 0)
 		end
 
