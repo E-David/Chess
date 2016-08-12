@@ -1,10 +1,9 @@
 module Chess
 	class Board
-		#attr_accessor 
-		attr_reader :grid, :previous_move
+		attr_accessor :grid, :previous_move
 		def initialize(input = {})
 			@grid = input.fetch(:grid, default_board)
-			@previous_move = {}
+			@previous_move = []
 			setup_board
 		end
 
@@ -216,38 +215,36 @@ module Chess
 			eliminating_pieces
 		end
 
-		def load_original_squares(move)
-			@previous_move = get_piece(move)
+		def load_previous_move(move)
+			@previous_move << get_square(move).clone
 		end
 
 		def reset
 			until @previous_move.empty?
-				move = previous_move.pop
+				move = @previous_move.pop
+				grid[move.coordinate[0]][move.coordinate[1]] = move
 			end
 		end
 
 		def still_in_check?(move_from,move_to,color)
-			
+			load_previous_move(move_from)
+			load_previous_move(move_to)
 			false_move_piece(move_from,move_to)
 			check = check?(color)
-			set_square(move_from,original_from_piece)
-			set_square(move_to,original_to_piece)
+			reset
 			check
 		end
 
 		#code for working game,but change it ASAP
 		def castling_still_in_check?(king_move_from,king_move_to,rook_move_from,rook_move_to,color)
-			original_king_from = get_piece(king_move_from)
-			original_king_to = get_piece(king_move_to)
-			original_rook_from = get_piece(rook_move_from)
-			original_rook_to = get_piece(rook_move_to)
+			load_previous_move(king_move_from)
+			load_previous_move(rook_move_from)
+			load_previous_move(king_move_to)
+			load_previous_move(rook_move_to)
 			false_move_piece(king_move_from,king_move_to)
 			false_move_piece(rook_move_from,rook_move_to)
 			check = check?(color)
-			set_square(king_move_from,original_king_from)
-			set_square(king_move_to,original_king_to)
-			set_square(rook_move_from,original_rook_from)
-			set_square(rook_move_to,original_rook_to)
+			reset
 			check
 		end
 
