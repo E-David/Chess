@@ -104,10 +104,7 @@ module Chess
 			end
 
 			def possible_moves
-				horiz = horizontal_moves
-				vertic = vertical_moves
-				possible_moves = horiz + vertic
-				return possible_moves
+				horizontal_moves + vertical_moves
 			end
 		end
 

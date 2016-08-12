@@ -1,8 +1,10 @@
 module Chess
 	class Board
-		attr_reader :grid
+		#attr_accessor 
+		attr_reader :grid, :previous_move
 		def initialize(input = {})
 			@grid = input.fetch(:grid, default_board)
+			@previous_move = {}
 			setup_board
 		end
 
@@ -214,9 +216,18 @@ module Chess
 			eliminating_pieces
 		end
 
+		def load_original_squares(move)
+			@previous_move = get_piece(move)
+		end
+
+		def reset
+			until @previous_move.empty?
+				move = previous_move.pop
+			end
+		end
+
 		def still_in_check?(move_from,move_to,color)
-			original_from_piece = get_piece(move_from)
-			original_to_piece = get_piece(move_to)
+			
 			false_move_piece(move_from,move_to)
 			check = check?(color)
 			set_square(move_from,original_from_piece)
