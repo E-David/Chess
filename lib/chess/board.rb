@@ -171,7 +171,7 @@ module Chess
 					if intersections.size >= 1
 						intersections.each do |intersection| 
 							if check_move(piece.position,intersection) == true
-								blocking_pieces << piece.position if still_in_check?(piece.position,intersection,color) == false
+								blocking_pieces << piece.position if move_puts_in_check?(piece.position,intersection,color) == false
 							end
 						end
 					end
@@ -196,7 +196,7 @@ module Chess
 			king = get_king(color)
 			original_position = king.position
 			possible_king_moves(king).each do |king_move|
-				king_moves << king_move if still_in_check?(king.position,king_move,color) == false
+				king_moves << king_move if move_puts_in_check?(king.position,king_move,color) == false
 			end
 			king_moves
 		end
@@ -206,7 +206,7 @@ module Chess
 			get_check_piece_positions(color).each do |check_piece_position|
 				ally_pieces(color).each do |ally_piece|
 					if check_move(ally_piece.position,check_piece_position) == true
-						if still_in_check?(ally_piece.position,check_piece_position,color) == false
+						if move_puts_in_check?(ally_piece.position,check_piece_position,color) == false
 							eliminating_pieces << ally_piece.position
 						end
 					end
@@ -215,7 +215,7 @@ module Chess
 			eliminating_pieces
 		end
 
-		def load_previous_move(move)
+		def load_move(move)
 			@previous_move << get_square(move).clone
 		end
 
@@ -226,23 +226,19 @@ module Chess
 			end
 		end
 
-		def still_in_check?(move_from,move_to,color)
-			load_previous_move(move_from)
-			load_previous_move(move_to)
-			false_move_piece(move_from,move_to)
+		def move_puts_in_check?(move_from,move_to,color)
+			[move_from,move_to].each { |move| load_move(move) }
+			move_piece(move_from,move_to)
 			check = check?(color)
 			reset
 			check
 		end
 
 		#code for working game,but change it ASAP
-		def castling_still_in_check?(king_move_from,king_move_to,rook_move_from,rook_move_to,color)
-			load_previous_move(king_move_from)
-			load_previous_move(rook_move_from)
-			load_previous_move(king_move_to)
-			load_previous_move(rook_move_to)
-			false_move_piece(king_move_from,king_move_to)
-			false_move_piece(rook_move_from,rook_move_to)
+		def castling_puts_in_check?(king_move_from,king_move_to,rook_move_from,rook_move_to,color)
+			[king_move_from,king_move_to,rook_move_from,rook_move_to].each { |move| load_move(move) }
+			move_piece(king_move_from,king_move_to)
+			move_piece(rook_move_from,rook_move_to)
 			check = check?(color)
 			reset
 			check
@@ -289,21 +285,11 @@ module Chess
 			array.map { |move| move.chessify_coordinates.join }.sort
 		end
 
-		#used for still_in_check? call to see if a move would put/keep king in check
-		def false_move_piece(coordinate_from,coordinate_to)
-			piece = get_piece(coordinate_from)
-			piece_class = Chess.const_get(piece.piece_name)
-			set_square(coordinate_to, piece_class.new(piece.color,coordinate_to))
-			erase_square(coordinate_from)
-		end
-
-		#vs. false move_piece method. When called, move count goes up and pieces are moved permanently
 		def move_piece(coordinate_from,coordinate_to)
 			piece = get_piece(coordinate_from)
-			move_num = piece.move_number
 			piece_class = Chess.const_get(piece.piece_name)
 			en_passant(coordinate_from,coordinate_to) if en_passant_move?(coordinate_from,coordinate_to)
-			set_square(coordinate_to, piece_class.new(piece.color,coordinate_to,move_num + 1))
+			set_square(coordinate_to, piece_class.new(piece.color,coordinate_to,piece.move_number+=1))
 			erase_square(coordinate_from)
 		end
 
@@ -469,7 +455,7 @@ module Chess
 			if move_unhindered?(rook_move_from,rook_move_to) == false
 				return "Rook is blocked by another piece" 
 			elsif
-				castling_still_in_check?(move_from,move_to,rook_move_from,rook_move_to,king.color)
+				castling_puts_in_check?(move_from,move_to,rook_move_from,rook_move_to,king.color)
 				return "Move would put King in check" 
 			else
 				move_piece(move_from,move_to)
@@ -482,7 +468,7 @@ module Chess
 			return "Invalid move" if is_valid_move?(move_from,move_to) == false
 			return "Target destination is an ally" if is_ally?(move_from,move_to) == true
 			return "Move is blocked by another piece" if move_unhindered?(move_from,move_to) == false
-			return "Move would put your King in check" if still_in_check?(move_from,move_to,color) == true
+			return "Move would put your King in check" if move_puts_in_check?(move_from,move_to,color) == true
 			return castling_move(move_from, move_to) if is_castling?(move_from,move_to) == true
 			true
 		end
