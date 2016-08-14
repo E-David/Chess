@@ -222,7 +222,7 @@ module Chess
 		def reset
 			until @previous_move.empty?
 				move = @previous_move.pop
-				grid[move.coordinate[0]][move.coordinate[1]] = move
+				grid[move.coordinate[1]][move.coordinate[0]] = move
 			end
 		end
 
