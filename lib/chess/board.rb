@@ -129,7 +129,7 @@ module Chess
 		end
 
 		def get_king(color)
-			all_pieces.each { |piece| return piece if piece.piece_name == "King" && piece.color == color }
+			all_pieces.each { |piece| p piece if piece.piece_name == "King" && piece.color == color }
 		end
 
 		def get_all_check_pieces(color)
@@ -216,13 +216,15 @@ module Chess
 		end
 
 		def load_move(move)
-			@previous_move << get_square(move).clone
+			square = get_square(move).clone
+			square.value = square.value.clone
+			@previous_move << square
 		end
 
 		def reset
 			until @previous_move.empty?
 				move = @previous_move.pop
-				grid[move.coordinate[1]][move.coordinate[0]] = move
+				set_square(move.coordinate,move.value)
 			end
 		end
 
@@ -426,7 +428,7 @@ module Chess
 		end
 
 		def is_castling?(move_from,move_to)
-			return false if !is_specified_piece?("King",move_from) || move_to[0].abs != 2
+			return false if !is_specified_piece?("King",move_from)
 			king = get_piece(move_from)
 			rook = get_castling_rook(move_from,move_to)
 			return false if !is_specified_piece?("Rook",rook.position)
@@ -455,7 +457,7 @@ module Chess
 			if move_unhindered?(rook_move_from,rook_move_to) == false
 				return "Rook is blocked by another piece" 
 			elsif
-				castling_puts_in_check?(move_from,move_to,rook_move_from,rook_move_to,king.color)
+				castling_puts_in_check?(move_from,move_to,rook_move_from,rook_move_to,king.color) == true
 				return "Move would put King in check" 
 			else
 				move_piece(move_from,move_to)

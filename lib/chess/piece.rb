@@ -57,8 +57,8 @@ module Chess
 	end
 
 		class Pawn < Piece
-			attr_reader :valid_moves, :unicode_char, :text_char, :move_number
-			attr_accessor :position
+			attr_reader :valid_moves, :unicode_char, :text_char
+			attr_accessor :position, :move_number
 			def initialize(color, position, move_number=0)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265F" : "\u2659"
@@ -93,8 +93,8 @@ module Chess
 		end
 
 		class Rook < Piece
-			attr_reader :valid_moves, :unicode_char, :text_char, :move_number
-			attr_accessor :position
+			attr_reader :valid_moves, :unicode_char, :text_char
+			attr_accessor :position, :move_number
 			def initialize(color, position, move_number=0)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265C" : "\u2656"
@@ -109,8 +109,8 @@ module Chess
 		end
 
 		class Knight < Piece
-			attr_reader :valid_moves, :unicode_char, :text_char, :move_number
-			attr_accessor :position
+			attr_reader :valid_moves, :unicode_char, :text_char
+			attr_accessor :position, :move_number
 			def initialize(color, position, move_number=0)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265E" : "\u2658"
@@ -134,8 +134,8 @@ module Chess
 		end
 		
 		class Bishop < Piece
-			attr_reader :valid_moves, :unicode_char, :text_char, :move_number
-			attr_accessor :position
+			attr_reader :valid_moves, :unicode_char, :text_char
+			attr_accessor :position, :move_number
 			def initialize(color, position, move_number=0)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265D" : "\u2657"
@@ -151,8 +151,8 @@ module Chess
 		end
 
 		class Queen < Piece
-			attr_reader :valid_moves, :unicode_char, :text_char, :move_number
-			attr_accessor :position
+			attr_reader :valid_moves, :unicode_char, :text_char
+			attr_accessor :position, :move_number
 			def initialize(color, position, move_number=0)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265B" : "\u2655"
@@ -171,8 +171,8 @@ module Chess
 		end
 		
 		class King < Piece
-			attr_reader :valid_moves, :unicode_char, :text_char, :move_number
-			attr_accessor :position
+			attr_reader :valid_moves, :unicode_char, :text_char
+			attr_accessor :position, :move_number
 			def initialize(color, position, move_number=0)
 				super(color, position)
 				@unicode_char = color == "black" ? "\u265A" : "\u2654"
