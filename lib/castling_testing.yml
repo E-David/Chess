@@ -64,11 +64,11 @@ board: !ruby/object:Chess::Board
     - !ruby/object:Chess::Square
       value: !ruby/object:Chess::Rook
         color: black
-        position:
+        position: &1
         - 1
         - 1
         piece_name: Rook
-        unicode_char: "♜"
+        unicode_char: "ΓÖ£"
         text_char: bR
         valid_moves:
         - - 1
@@ -103,11 +103,9 @@ board: !ruby/object:Chess::Board
           - 1
         - - 8
           - 1
-        move_number: 1
+        move_number: 0
       color: BB
-      coordinate:
-      - 1
-      - 1
+      coordinate: *1
     - !ruby/object:Chess::Square
       value: ''
       color: WW
@@ -133,7 +131,7 @@ board: !ruby/object:Chess::Board
         - 5
         - 1
         piece_name: King
-        unicode_char: "♚"
+        unicode_char: "ΓÖÜ"
         text_char: bK
         move_number: 0
         valid_moves:
@@ -162,7 +160,7 @@ board: !ruby/object:Chess::Board
         - 6
         - 1
         piece_name: Bishop
-        unicode_char: "♝"
+        unicode_char: "ΓÖ¥"
         text_char: bB
         valid_moves:
         - - 5
@@ -191,7 +189,7 @@ board: !ruby/object:Chess::Board
         - 7
         - 1
         piece_name: Knight
-        unicode_char: "♞"
+        unicode_char: "ΓÖ₧"
         text_char: bN
         valid_moves:
         - - 8
@@ -212,7 +210,7 @@ board: !ruby/object:Chess::Board
         - 8
         - 1
         piece_name: Rook
-        unicode_char: "♜"
+        unicode_char: "ΓÖ£"
         text_char: bR
         valid_moves:
         - - 8
@@ -265,7 +263,7 @@ board: !ruby/object:Chess::Board
         - 1
         - 2
         piece_name: Pawn
-        unicode_char: "♟"
+        unicode_char: "ΓÖƒ"
         text_char: bP
         valid_moves:
         - - 1
@@ -286,7 +284,7 @@ board: !ruby/object:Chess::Board
         - 2
         - 2
         piece_name: Pawn
-        unicode_char: "♟"
+        unicode_char: "ΓÖƒ"
         text_char: bP
         valid_moves:
         - - 2
@@ -309,7 +307,7 @@ board: !ruby/object:Chess::Board
         - 3
         - 2
         piece_name: Pawn
-        unicode_char: "♟"
+        unicode_char: "ΓÖƒ"
         text_char: bP
         valid_moves:
         - - 3
@@ -326,7 +324,34 @@ board: !ruby/object:Chess::Board
       - 3
       - 2
     - !ruby/object:Chess::Square
-      value: ''
+      value: !ruby/object:Chess::Bishop
+        color: black
+        position:
+        - 4
+        - 2
+        piece_name: Bishop
+        unicode_char: "♝"
+        text_char: bB
+        valid_moves:
+        - - 3
+          - 1
+        - - 3
+          - 3
+        - - 2
+          - 4
+        - - 1
+          - 5
+        - - 5
+          - 1
+        - - 5
+          - 3
+        - - 6
+          - 4
+        - - 7
+          - 5
+        - - 8
+          - 6
+        move_number: 1
       color: BB
       coordinate:
       - 4
@@ -338,7 +363,7 @@ board: !ruby/object:Chess::Board
         - 5
         - 2
         piece_name: Pawn
-        unicode_char: "♟"
+        unicode_char: "ΓÖƒ"
         text_char: bP
         valid_moves:
         - - 5
@@ -361,7 +386,7 @@ board: !ruby/object:Chess::Board
         - 6
         - 2
         piece_name: Pawn
-        unicode_char: "♟"
+        unicode_char: "ΓÖƒ"
         text_char: bP
         valid_moves:
         - - 6
@@ -384,7 +409,7 @@ board: !ruby/object:Chess::Board
         - 7
         - 2
         piece_name: Pawn
-        unicode_char: "♟"
+        unicode_char: "ΓÖƒ"
         text_char: bP
         valid_moves:
         - - 7
@@ -407,7 +432,7 @@ board: !ruby/object:Chess::Board
         - 8
         - 2
         piece_name: Pawn
-        unicode_char: "♟"
+        unicode_char: "ΓÖƒ"
         text_char: bP
         valid_moves:
         - - 8
@@ -434,7 +459,7 @@ board: !ruby/object:Chess::Board
         - 1
         - 3
         piece_name: Knight
-        unicode_char: "♞"
+        unicode_char: "ΓÖ₧"
         text_char: bN
         valid_moves:
         - - 3
@@ -445,7 +470,7 @@ board: !ruby/object:Chess::Board
           - 5
         - - 2
           - 1
-        move_number: 11
+        move_number: 1
       color: BB
       coordinate:
       - 1
@@ -469,7 +494,7 @@ board: !ruby/object:Chess::Board
         - 4
         - 3
         piece_name: Queen
-        unicode_char: "♛"
+        unicode_char: "ΓÖ¢"
         text_char: bQ
         valid_moves:
         - - 4
@@ -526,7 +551,7 @@ board: !ruby/object:Chess::Board
           - 6
         - - 8
           - 7
-        move_number: 10
+        move_number: 1
       color: WW
       coordinate:
       - 4
@@ -550,30 +575,7 @@ board: !ruby/object:Chess::Board
       - 7
       - 3
     - !ruby/object:Chess::Square
-      value: !ruby/object:Chess::Bishop
-        color: white
-        position:
-        - 8
-        - 3
-        piece_name: Bishop
-        unicode_char: "♗"
-        text_char: wB
-        valid_moves:
-        - - 7
-          - 2
-        - - 6
-          - 1
-        - - 7
-          - 4
-        - - 6
-          - 5
-        - - 5
-          - 6
-        - - 4
-          - 7
-        - - 3
-          - 8
-        move_number: 15
+      value: ''
       color: WW
       coordinate:
       - 8
@@ -609,7 +611,7 @@ board: !ruby/object:Chess::Board
         - 4
         - 4
         piece_name: Pawn
-        unicode_char: "♟"
+        unicode_char: "ΓÖƒ"
         text_char: bP
         valid_moves:
         - - 4
@@ -618,7 +620,7 @@ board: !ruby/object:Chess::Board
           - 5
         - - 5
           - 5
-        move_number: 6
+        move_number: 1
       color: BB
       coordinate:
       - 4
@@ -678,7 +680,7 @@ board: !ruby/object:Chess::Board
         - 4
         - 5
         piece_name: Pawn
-        unicode_char: "♙"
+        unicode_char: "ΓÖÖ"
         text_char: wP
         valid_moves:
         - - 4
@@ -687,7 +689,7 @@ board: !ruby/object:Chess::Board
           - 4
         - - 3
           - 4
-        move_number: 6
+        move_number: 1
       color: WW
       coordinate:
       - 4
@@ -725,11 +727,11 @@ board: !ruby/object:Chess::Board
     - !ruby/object:Chess::Square
       value: !ruby/object:Chess::Knight
         color: white
-        position:
+        position: &2
         - 1
         - 6
         piece_name: Knight
-        unicode_char: "♘"
+        unicode_char: "ΓÖÿ"
         text_char: wN
         valid_moves:
         - - 3
@@ -740,11 +742,9 @@ board: !ruby/object:Chess::Board
           - 8
         - - 2
           - 4
-        move_number: 8
+        move_number: 1
       color: WW
-      coordinate:
-      - 1
-      - 6
+      coordinate: *2
     - !ruby/object:Chess::Square
       value: ''
       color: BB
@@ -764,7 +764,7 @@ board: !ruby/object:Chess::Board
         - 4
         - 6
         piece_name: Queen
-        unicode_char: "♕"
+        unicode_char: "ΓÖò"
         text_char: wQ
         valid_moves:
         - - 4
@@ -821,7 +821,7 @@ board: !ruby/object:Chess::Board
           - 7
         - - 6
           - 8
-        move_number: 10
+        move_number: 1
       color: BB
       coordinate:
       - 4
@@ -845,30 +845,7 @@ board: !ruby/object:Chess::Board
       - 7
       - 6
     - !ruby/object:Chess::Square
-      value: !ruby/object:Chess::Bishop
-        color: black
-        position:
-        - 8
-        - 6
-        piece_name: Bishop
-        unicode_char: "♝"
-        text_char: bB
-        valid_moves:
-        - - 7
-          - 5
-        - - 6
-          - 4
-        - - 5
-          - 3
-        - - 4
-          - 2
-        - - 3
-          - 1
-        - - 7
-          - 7
-        - - 6
-          - 8
-        move_number: 12
+      value: ''
       color: BB
       coordinate:
       - 8
@@ -886,7 +863,7 @@ board: !ruby/object:Chess::Board
         - 1
         - 7
         piece_name: Pawn
-        unicode_char: "♙"
+        unicode_char: "ΓÖÖ"
         text_char: wP
         valid_moves:
         - - 1
@@ -895,7 +872,7 @@ board: !ruby/object:Chess::Board
           - 6
         - - 1
           - 5
-        move_number: 1
+        move_number: 0
       color: BB
       coordinate:
       - 1
@@ -907,7 +884,7 @@ board: !ruby/object:Chess::Board
         - 2
         - 7
         piece_name: Pawn
-        unicode_char: "♙"
+        unicode_char: "ΓÖÖ"
         text_char: wP
         valid_moves:
         - - 2
@@ -930,7 +907,7 @@ board: !ruby/object:Chess::Board
         - 3
         - 7
         piece_name: Pawn
-        unicode_char: "♙"
+        unicode_char: "ΓÖÖ"
         text_char: wP
         valid_moves:
         - - 3
@@ -947,7 +924,34 @@ board: !ruby/object:Chess::Board
       - 3
       - 7
     - !ruby/object:Chess::Square
-      value: ''
+      value: !ruby/object:Chess::Bishop
+        color: white
+        position:
+        - 4
+        - 7
+        piece_name: Bishop
+        unicode_char: "♗"
+        text_char: wB
+        valid_moves:
+        - - 3
+          - 6
+        - - 2
+          - 5
+        - - 1
+          - 4
+        - - 3
+          - 8
+        - - 5
+          - 6
+        - - 6
+          - 5
+        - - 7
+          - 4
+        - - 8
+          - 3
+        - - 5
+          - 8
+        move_number: 1
       color: WW
       coordinate:
       - 4
@@ -959,7 +963,7 @@ board: !ruby/object:Chess::Board
         - 5
         - 7
         piece_name: Pawn
-        unicode_char: "♙"
+        unicode_char: "ΓÖÖ"
         text_char: wP
         valid_moves:
         - - 5
@@ -982,7 +986,7 @@ board: !ruby/object:Chess::Board
         - 6
         - 7
         piece_name: Pawn
-        unicode_char: "♙"
+        unicode_char: "ΓÖÖ"
         text_char: wP
         valid_moves:
         - - 6
@@ -1005,7 +1009,7 @@ board: !ruby/object:Chess::Board
         - 7
         - 7
         piece_name: Pawn
-        unicode_char: "♙"
+        unicode_char: "ΓÖÖ"
         text_char: wP
         valid_moves:
         - - 7
@@ -1028,7 +1032,7 @@ board: !ruby/object:Chess::Board
         - 8
         - 7
         piece_name: Pawn
-        unicode_char: "♙"
+        unicode_char: "ΓÖÖ"
         text_char: wP
         valid_moves:
         - - 8
@@ -1055,7 +1059,7 @@ board: !ruby/object:Chess::Board
         - 1
         - 8
         piece_name: Rook
-        unicode_char: "♖"
+        unicode_char: "ΓÖû"
         text_char: wR
         valid_moves:
         - - 1
@@ -1120,7 +1124,7 @@ board: !ruby/object:Chess::Board
         - 5
         - 8
         piece_name: King
-        unicode_char: "♔"
+        unicode_char: "ΓÖö"
         text_char: wK
         move_number: 0
         valid_moves:
@@ -1149,7 +1153,7 @@ board: !ruby/object:Chess::Board
         - 6
         - 8
         piece_name: Bishop
-        unicode_char: "♗"
+        unicode_char: "ΓÖù"
         text_char: wB
         valid_moves:
         - - 5
@@ -1178,7 +1182,7 @@ board: !ruby/object:Chess::Board
         - 7
         - 8
         piece_name: Knight
-        unicode_char: "♘"
+        unicode_char: "ΓÖÿ"
         text_char: wN
         valid_moves:
         - - 8
@@ -1199,7 +1203,7 @@ board: !ruby/object:Chess::Board
         - 8
         - 8
         piece_name: Rook
-        unicode_char: "♖"
+        unicode_char: "ΓÖû"
         text_char: wR
         valid_moves:
         - - 8
@@ -1240,12 +1244,10 @@ board: !ruby/object:Chess::Board
       - 8
       - 8
   previous_move: []
-players:
-- &2 !ruby/object:Chess::Player
+players: 
+current_player: !ruby/object:Chess::Player
   name: Alpha
-  color: black
-- &1 !ruby/object:Chess::Player
-  name: Omega
   color: white
-current_player: *1
-other_player: *2
+other_player: !ruby/object:Chess::Player
+  name: Omega
+  color: black

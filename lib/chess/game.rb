@@ -119,8 +119,13 @@ module Chess
 					move_to = get_coordinate
 					puts board.get_piece(move_to).to_s if board.get_piece(move_to) != ""
 					if board.check_move(move_from,move_to) == true
-						board.move_piece(move_from,move_to)
-						break
+						if board.is_castling?(move_from,move_to) == true
+							board.castling_move_piece(move_from,move_to)
+							break
+						else
+							board.move_piece(move_from,move_to)
+							break
+						end
 					else
 						puts board.check_move(move_from,move_to)
 					end

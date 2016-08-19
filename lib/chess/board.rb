@@ -129,17 +129,18 @@ module Chess
 		end
 
 		def get_king(color)
-			all_pieces.each { |piece| p piece if piece.piece_name == "King" && piece.color == color }
+			king = ""
+			all_pieces.each { |piece| king = piece if (is_specified_piece?("King",piece.position) && piece.color == color) }
+			king
 		end
 
-		def get_all_check_pieces(color)
-			king = get_king(color)
+		def get_all_check_pieces(color,king)
 			enemy_pieces(color).select { |piece| piece.valid_moves.include?(king.position) }
 		end
 
-		def get_valid_check_pieces(color)
-			king = get_king(color)
-			get_all_check_pieces(color).select do |piece| 
+		#King is separated because check move would say checking King would be in check if it moved. Fix later.
+		def get_valid_check_pieces(color,king)
+			get_all_check_pieces(color,king).select do |piece| 
 				(is_specified_piece?("King",piece.position) || check_move(piece.position,king.position)) == true
 			end
 		end
@@ -153,7 +154,7 @@ module Chess
 		def get_check_paths(color)
 			king = get_king(color)
 			check_paths = []
-			get_valid_check_pieces(color).each { |piece| check_paths << get_path(piece.position,king.position) }
+			get_valid_check_pieces(color,king).each { |piece| check_paths << get_path(piece.position,king.position) }
 			check_paths.each { |path| path.delete_if { |x| x == king.position } }
 		end
 
@@ -187,7 +188,7 @@ module Chess
 		
 		def possible_king_moves(king)
 			king.valid_moves.select do |move| 
-				check_move(king.position,move) && (is_unoccupied?(move) || !is_ally?(king.position,move))
+				check_move(king.position,move) == true
 			end
 		end
 
@@ -275,6 +276,7 @@ module Chess
 
 		def get_legal_moves(coordinate)
 			piece = get_piece(coordinate)
+
 			piece.valid_moves.select { |move| check_move(piece.position,move) == true }
 		end
 
@@ -428,10 +430,15 @@ module Chess
 		end
 
 		def is_castling?(move_from,move_to)
-			return false if !is_specified_piece?("King",move_from)
+			return false if !is_specified_piece?("King",move_from) || (move_from[0] - move_to[0]).abs != 2 
 			king = get_piece(move_from)
 			rook = get_castling_rook(move_from,move_to)
 			return false if !is_specified_piece?("Rook",rook.position)
+		end
+
+		def can_castle?(move_from,move_to)
+			king = get_piece(move_from)
+			rook = get_castling_rook(move_from,move_to)
 			(king.move_number == 0 && rook.move_number == 0)
 		end
 
@@ -449,7 +456,7 @@ module Chess
 			[rook_col,rook_row]
 		end
 
-		def castling_move(move_from,move_to)
+		def castling_move_piece(move_from,move_to)
 			king = get_piece(move_from)
 			rook = get_castling_rook(move_from,move_to)
 			rook_move_from = rook.position
@@ -471,7 +478,7 @@ module Chess
 			return "Target destination is an ally" if is_ally?(move_from,move_to) == true
 			return "Move is blocked by another piece" if move_unhindered?(move_from,move_to) == false
 			return "Move would put your King in check" if move_puts_in_check?(move_from,move_to,color) == true
-			return castling_move(move_from, move_to) if is_castling?(move_from,move_to) == true
+			return "Cannot castle" if is_castling?(move_from,move_to) && can_castle?(move_from,move_to) == false
 			true
 		end
 
