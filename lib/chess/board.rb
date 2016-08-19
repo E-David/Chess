@@ -276,7 +276,6 @@ module Chess
 
 		def get_legal_moves(coordinate)
 			piece = get_piece(coordinate)
-
 			piece.valid_moves.select { |move| check_move(piece.position,move) == true }
 		end
 
@@ -292,7 +291,6 @@ module Chess
 		def move_piece(coordinate_from,coordinate_to)
 			piece = get_piece(coordinate_from)
 			piece_class = Chess.const_get(piece.piece_name)
-			en_passant(coordinate_from,coordinate_to) if en_passant_move?(coordinate_from,coordinate_to)
 			set_square(coordinate_to, piece_class.new(piece.color,coordinate_to,piece.move_number+=1))
 			erase_square(coordinate_from)
 		end
@@ -418,9 +416,10 @@ module Chess
 		def en_passant_move?(move_from,move_to)
 			return false if !is_specified_piece?("Pawn",move_from)
 			enemy_piece = get_en_passant_piece(move_from,move_to)
-			return false if enemy_piece == ""
-			if  is_specified_piece?("Pawn",enemy_piece.position)
-				enemy_piece.move_number == 1
+			if enemy_piece != ""
+				if is_specified_piece?("Pawn",enemy_piece.position)
+					enemy_piece.move_number == 1
+				end
 			end
 		end
 
@@ -434,6 +433,7 @@ module Chess
 			king = get_piece(move_from)
 			rook = get_castling_rook(move_from,move_to)
 			return false if !is_specified_piece?("Rook",rook.position)
+			true
 		end
 
 		def can_castle?(move_from,move_to)

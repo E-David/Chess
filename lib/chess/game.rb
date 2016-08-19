@@ -122,6 +122,10 @@ module Chess
 						if board.is_castling?(move_from,move_to) == true
 							board.castling_move_piece(move_from,move_to)
 							break
+						elsif board.en_passant_move?(move_from,move_to)
+							board.move_piece(move_from,move_to)
+							board.en_passant(move_from,move_to)
+							break
 						else
 							board.move_piece(move_from,move_to)
 							break
